@@ -11,3 +11,8 @@ class TrainAPIException(TrainBaseException):
     """
     12306 API 异常
     """
+
+class TrainUserNotLogin(TrainAPIException):
+    """
+    用户未登录
+    """
