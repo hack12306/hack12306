@@ -154,6 +154,13 @@ class TrainApi(object):
     def order_query(self, start_date, end_date, type='1', sequeue_train_name='', come_from_flag='my_order', query_where='G', **kwargs):
         """
         订单-查询
+        :param start_date 开始日期，格式YYYY-mm-dd
+        :param end_date 结束日期，格式 YYYY-mm-dd
+        :param type 查询类型 "1"-按订票日期查询，"2"-按乘车日期查询
+        :param sequeue_train_name 订单号，车次，姓名
+        :param come_from_flag 来源标志 “my_order”-全部，“my_resign”-可改签，“my_cs_resgin”-可变更到站，“my_refund”-可退款
+        :param query_where 订单来源 "G"-未出行，"H"-历史订单
+        :return JSON LIST
         """
         date_pattern = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
 
@@ -174,7 +181,20 @@ class TrainApi(object):
             'pageIndex': kwargs.get('page_offset', 0),
             'pageSize': kwargs.get('page_size', 8),
         }
-        import urllib
-        print urllib.urlencode(params)
         resp = self.submit(url, params, method='POST', **kwargs)
-        return resp['data']['OrderDTODataList']
+
+        if 'data' in resp and 'orderDTODataList' in resp['data']:
+            return resp['data']['OrderDTODataList']
+        else:
+            return []
+
+    def order_query_no_complete(self, **kwargs):
+        """
+        订单-未完成订单
+        """
+        url = 'https://kyfw.12306.cn/otn/queryOrder/queryMyOrderNoComplete'
+        resp = self.submit(url, method='POST', **kwargs)
+        if 'data' in resp and 'OrderDTODataList' in resp['data']:
+            return resp['data']['OrderDTODataList']
+        else:
+            return []
