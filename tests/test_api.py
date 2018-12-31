@@ -82,3 +82,9 @@ class TestTrainApi(object):
         result = train_api.info_query_train_no('24000000G505', 'VNP', 'SHH', date_str)
         assert isinstance(result, list)
         print json.dumps(result, ensure_ascii=False)
+
+    def test_info_query_ticket_price(self):
+        date_str = tomorrow().strftime('%Y-%m-%d')
+        result = train_api.info_query_ticket_price('24000000G505', '1', '2', 'WZ', date_str)
+        assert isinstance(result, dict)
+        print json.dumps(result, ensure_ascii=False)

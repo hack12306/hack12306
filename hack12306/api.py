@@ -42,6 +42,8 @@ class TrainApi(object):
         _logger.debug('train request. url:%s method:%s params:%s' % (url, method, json.dumps(params)))
 
         if method == 'GET':
+            if isinstance(params, list):
+                params = urlencode(params)
             resp = requests.get(url, params, **kwargs)
         elif method == 'POST':
             if format == 'json':
@@ -74,7 +76,7 @@ class TrainApi(object):
             raise exceptions.TrainAPIException('response is not valid json type')
 
         if content_json['status'] is not True:
-            raise exceptions.TrainAPIException(content_json['errMsg'])
+            raise exceptions.TrainAPIException(content_json.get('errMsg', json.dumps(content_json, ensure_ascii=False)))
 
         return content_json
 
@@ -258,3 +260,32 @@ class TrainApi(object):
             return resp['data']['data']
         else:
             return []
+
+    def info_query_ticket_price(self, train_no, from_station_no, to_station_no, seat_types, train_date, **kwargs):
+        """
+        信息查询-车票价格
+        :param train_no 车次号
+        :param from_station_no 始发站
+        :param to_station_no 到站
+        :param seat_types 席别
+        :param train_date 日期
+        :return JSON DICT
+        """
+        date_pattern = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        assert date_pattern.match(train_date), 'Invalid train_date param. %s' % train_date
+
+        # TODO 席别枚举检查
+
+        url = 'https://kyfw.12306.cn/otn/leftTicket/queryTicketPrice'
+        params = [
+            ('train_no', train_no),
+            ('from_station_no', from_station_no),
+            ('to_station_no', to_station_no),
+            ('seat_types', seat_types),
+            ('train_date', train_date)
+        ]
+        resp = self.submit(url, params, method='GET', **kwargs)
+        if 'data' in resp:
+            return resp['data']
+        else:
+            return {}
