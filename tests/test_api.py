@@ -2,6 +2,7 @@
 
 import json
 import pytest
+import datetime
 from hack12306.api import TrainApi
 
 train_api = TrainApi()
@@ -69,3 +70,8 @@ class TestTrainApi(object):
         assert isinstance(result, list)
         print json.dumps(result)
 
+    def test_info_query_station_trains(self):
+        today_str = datetime.date.today().strftime('%Y-%m-%d')
+        result = train_api.info_query_station_trains(today_str, 'LFV')
+        assert isinstance(result, list)
+        print json.dumps(result, ensure_ascii=False)

@@ -201,6 +201,7 @@ class TrainApi(object):
         else:
             return []
 
+    @check_login
     def order_query_no_complete(self, **kwargs):
         """
         订单-未完成订单
@@ -211,3 +212,22 @@ class TrainApi(object):
             return resp['data']['OrderDTODataList']
         else:
             return []
+
+    def info_query_station_trains(self, train_start_date, train_station_code, **kwargs):
+        """
+        信息查询-车站(车次)查询
+        :param train_start_date 开始日期
+        :param train_station_code 车站编码
+        :return JSON LIST
+        """
+        date_pattern = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        assert date_pattern.match(train_start_date), 'Invalid train_start_date param. %s' % train_start_date
+
+        url = 'https://kyfw.12306.cn/otn/czxx/query'
+        params = {
+            'train_start_date': train_start_date,
+            'train_station_code': train_station_code
+        }
+        resp = self.submit(url, params, method='GET', **kwargs)
+        if 'data' in resp and 'data' in resp['data']:
+            return resp['data']['data']
