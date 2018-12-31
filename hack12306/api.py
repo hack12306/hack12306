@@ -5,8 +5,9 @@ import json
 import logging
 import requests
 
-from . import exceptions
+from . import settings
 from . import constants
+from . import exceptions
 
 _logger = logging.getLogger('hack12306')
 
@@ -35,7 +36,7 @@ class TrainApi(object):
     12306 Train API.
     """
 
-    def submit(self, url, params=None, method='POST', format='json', **kwargs):
+    def submit(self, url, params=None, method='POST', format='form', **kwargs):
         _logger.debug('train request. url:%s method:%s params:%s' % (url, method, json.dumps(params)))
 
         if method == 'GET':
@@ -54,6 +55,19 @@ class TrainApi(object):
         try:
             content_json = json.loads(resp.content)
         except ValueError as e:
+            if settings.DEBUG:
+                import os
+                import uuid
+                import datetime
+
+                today_str = datetime.date.today().strftime('%Y-%m-%d')
+                filepath = '/tmp/hack12306/%s/%s-%s' % (today_str, url, uuid.uuid1().hex)
+                if not os.path.exists(os.path.dirname(filepath)):
+                    os.makedirs(os.path.dirname(filepath))
+
+                with open(filepath, 'w') as f:
+                    f.write(resp.content)
+
             _logger.warning(e)
             raise exceptions.TrainAPIException('response is not valid json type')
 
@@ -182,8 +196,7 @@ class TrainApi(object):
             'pageSize': kwargs.get('page_size', 8),
         }
         resp = self.submit(url, params, method='POST', **kwargs)
-
-        if 'data' in resp and 'orderDTODataList' in resp['data']:
+        if 'data' in resp and 'OrderDTODataList' in resp['data']:
             return resp['data']['OrderDTODataList']
         else:
             return []
