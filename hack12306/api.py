@@ -4,10 +4,12 @@ import re
 import json
 import logging
 import requests
+import collections
 
 from . import settings
 from . import constants
 from . import exceptions
+from .utils import urlencode
 
 _logger = logging.getLogger('hack12306')
 
@@ -231,3 +233,28 @@ class TrainApi(object):
         resp = self.submit(url, params, method='GET', **kwargs)
         if 'data' in resp and 'data' in resp['data']:
             return resp['data']['data']
+
+    def info_query_train_no(self, train_no, from_station_telecode, to_station_telecode, depart_date, **kwargs):
+        """
+        信息查询-车次查询
+        :param train_no 车次号
+        :param from_station_telecode 起始车站编码
+        :param to_station_telecode 到站车站编码
+        :param depart_date 乘车日期
+        :return JSON DICT
+        """
+        date_pattern = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        assert date_pattern.match(depart_date), 'Invalid depart_date param. %s' % depart_date
+
+        url = 'https://kyfw.12306.cn/otn/czxx/queryByTrainNo'
+        params = [
+            ('train_no', train_no),
+            ('from_station_telecode', from_station_telecode),
+            ('to_station_telecode', to_station_telecode),
+            ('depart_date', depart_date),
+        ]
+        resp = self.submit(url, params, method='GET', **kwargs)
+        if 'data' in resp and 'data' in resp['data']:
+            return resp['data']['data']
+        else:
+            return []
