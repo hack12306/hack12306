@@ -38,7 +38,7 @@ class TrainApi(object):
     12306 Train API.
     """
 
-    def submit(self, url, params=None, method='POST', format='form', **kwargs):
+    def submit(self, url, params=None, method='POST', format='form', parse_resp=True, **kwargs):
         _logger.debug('train request. url:%s method:%s params:%s' % (url, method, json.dumps(params)))
 
         if method == 'GET':
@@ -52,6 +52,9 @@ class TrainApi(object):
                 resp = requests.post(url, data=params, **kwargs)
         else:
             assert False, 'Unknown http method'
+
+        if not parse_resp:
+            return resp
 
         if resp.status_code != 200:
             raise exceptions.TrainAPIException()
@@ -289,3 +292,48 @@ class TrainApi(object):
             return resp['data']
         else:
             return {}
+
+    def info_query_station_list(self, station_version=None, **kwargs):
+        """
+        信息查询-车站列表
+        :param station_version 版本号
+        :return TODO
+        """
+        def _parse_stations(s):
+            station_list = []
+
+            s = s.replace(';', '')
+            s = s.replace('var station_names =', '')
+
+            s_list = s.split('@')
+            s_list.pop(0)
+
+            for station in s_list:
+                station_tuple = tuple(station.split('|'))
+                station_list.append({
+                    'name': station_tuple[1],
+                    'short_name': station_tuple[0],
+                    'code': station_tuple[2],
+                    'english_name': station_tuple[3],
+                    'index': station_tuple[5]
+                })
+            return station_list
+
+        url = 'https://kyfw.12306.cn/otn/resources/js/framework/station_name.js'
+        params = {
+            'station_version': station_version or '',
+        }
+        resp = self.submit(url, params, method='GET', parse_resp=False, **kwargs)
+        if not resp.status_code == 200:
+            raise exceptions.TrainAPIException(str(resp))
+
+        return _parse_stations(resp.content)
+
+    def info_query_station_by_name(self, station_name, station_version=None, **kwargs):
+        station_list = self.info_query_station_list(station_version)
+        for station in station_list:
+            if station['name'] == station_name:
+                return station
+        else:
+            return None
+
