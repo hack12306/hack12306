@@ -7,6 +7,12 @@ class TrainBaseException(Exception):
     """
 
 
+class TrainRequestException(TrainBaseException):
+    """
+    12306请求异常
+    """
+
+
 class TrainAPIException(TrainBaseException):
     """
     12306 API 异常

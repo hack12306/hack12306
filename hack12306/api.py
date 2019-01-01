@@ -57,7 +57,7 @@ class TrainApi(object):
             return resp
 
         if resp.status_code != 200:
-            raise exceptions.TrainAPIException()
+            raise exceptions.TrainRequestException(str(resp))
 
         try:
             content_json = json.loads(resp.content)
@@ -76,7 +76,7 @@ class TrainApi(object):
                     f.write(resp.content)
 
             _logger.warning(e)
-            raise exceptions.TrainAPIException('response is not valid json type')
+            raise exceptions.TrainRequestException('response is not valid json type')
 
         if content_json['status'] is not True:
             raise exceptions.TrainAPIException(content_json.get('errMsg', json.dumps(content_json, ensure_ascii=False)))
@@ -337,3 +337,50 @@ class TrainApi(object):
         else:
             return None
 
+    @check_login
+    def member_info_query_member(self, **kwargs):
+        """
+        会员中心-查询信息
+        :return JSON DICT
+        """
+        url = 'https://cx.12306.cn/tlcx/memberInfo/queryMemberIntegration'
+        resp = self.submit(url, method='POST', **kwargs)
+        if 'data' in resp:
+            return resp['data']
+        else:
+            return {}
+
+    @check_login
+    def member_info_query_member_point(self, **kwargs):
+        """
+        会员中心-查询会员等级
+        :return JSON DICT
+        """
+        url = 'https://cx.12306.cn/tlcx/memberInfo/memberPointQuery'
+        resp = self.submit(url, method='POST', **kwargs)
+        if 'data' in resp:
+            return resp['data']
+        else:
+            return {}
+
+    @check_login
+    def member_info_query_point_history(self, query_type, start_date, end_date, page_index=1, page_size=10, **kwargs):
+        """
+        会员中心-查询积分记录
+        :return TODO
+        """
+        date_pattern = re.compile('^[0-9]{4}[0-9]{2}[0-9]{2}$')
+        assert query_type in dict(constants.MEMBER_INFO_POINT_QUERY_TYPE).keys(), 'Invalid query_type param. %s' % query_type
+        assert isinstance(start_date, str) and date_pattern.match(start_date), 'Invalid start_date param. %s' % start_date
+        assert isinstance(end_date, str) and date_pattern.match(end_date), 'Invalid end_date param. %s' % end_date
+
+        url = 'https://cx.12306.cn/tlcx/memberInfo/pointSimpleQuery'
+        params = [
+            ('queryType', query_type),
+            ('queryStartDate', start_date),
+            ('queryEndDate', end_date),
+            ('pageIndex', page_index),
+            ('pageSize', page_size),
+        ]
+        resp = self.submit(url, params, method='POST', **kwargs)
+        return resp
