@@ -10,6 +10,15 @@ def cookie_str_to_dict(cookie_str):
         cookies.append(cookie.split('='))
     return dict(cookies)
 
+def get_cookie_from_str(cookie_str):
+    cookie_dict = cookie_str_to_dict(cookie_str)
+    return {
+        'BIGipServerotn': cookie_dict.get('BIGipServerotn', ''),
+        'JSESSIONID': cookie_dict.get('JSESSIONID', ''),
+        'tk': cookie_dict.get('tk', ''),
+        'route': cookie_dict.get('route', ''),
+    }
+
 
 def tomorrow():
     return datetime.date.today() + datetime.timedelta(days=1)

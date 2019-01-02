@@ -10,12 +10,10 @@ from hack12306 import exceptions
 train_api = TrainApi()
 
 COOKIES = {
-    "BIGipServerpool_tlcx": "48235018.31270.0000",
-    "RAIL_DEVICEID": "Dv9nY4_XzkbPhbA2wlkpuJ39PRw9LB-edng2VfjfYG3lcu6wKLR5PSF6LzzPc3WvbNuXVX_BN3R0ABFl6Ms_nccEBGM51kc6kg-XKryfTxtTv8_8pGXJxUfUXS8TcFEhQB_uvqNsfemB10Wjh4SdlCN-JAbEkb7E",
-    "route": "7476ffad615b7b71cbf5b6e46add2a8a",
-    "JSESSIONID": "CDC4105F76D9D777956065A99D5F6D3D",
-    "tk": "r3phpjBJ2Sm_1czN9sPQdRKYFu1c41D4ntDiKArwh2h0",
-    "RAIL_EXPIRATION": "1546327103738"
+    "BIGipServerotn": "1139802634.50210.0000",
+    "JSESSIONID": "A86467155C703BE970693459165C6179",
+    "tk": "8ZpzMsxgF3ZuuibLHcB-PZlCS3mwpwxv7JSskAnxh2h0",
+    "route": "c5c62a339e7744272a54643b3be5bf64",
 }
 
 
@@ -105,3 +103,21 @@ class TestTrainApi(object):
             end_date_str = today().strftime('%Y%m%d')
             result = train_api.member_info_query_point_history('0', start_date_str, end_date_str, cookies=COOKIES)
             print json.dumps(result, ensure_ascii=False)
+
+    def test_auth_qr_get(self):
+        result = train_api.auth_qr_get()
+        assert 'image' in result
+
+    def qr_check(self):
+        result = train_api.auth_qr_get()
+        return train_api.auth_qr_check(result['uuid'])
+
+    def test_auth_qr_check(self):
+        result = self.qr_check()
+        assert isinstance(result, dict)
+        print json.dumps(result, ensure_ascii=False)
+
+    def test_auth_init(self):
+        result = train_api.auth_init()
+        assert isinstance(result, dict)
+        print json.dumps(result, ensure_ascii=False)

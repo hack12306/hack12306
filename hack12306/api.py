@@ -85,6 +85,93 @@ class TrainApi(object):
 
         return content_json
 
+    def auth_init(self, **kwargs):
+        """
+        认证-初始化，获取 cookies 信息
+        :return JSON DICT
+        """
+        route_pattern = re.compile(r'route=[0-9, a-z]*;')
+        jsessionid_pattern = re.compile(r'JSESSIONID=[0-9, a-z, A-Z]*;')
+        bigipserverotn_pattern = re.compile(r'BIGipServerotn=[0-9, \.]*;')
+
+        url = 'https://kyfw.12306.cn/otn/login/conf'
+        resp = self.submit(url, method='POST', parse_resp=False, **kwargs)
+        if resp.status_code != 200:
+            raise exceptions.TrainRequestException()
+
+        cookie_str = resp.headers['Set-Cookie']
+        cookie_dict = {
+            'route': route_pattern.search(cookie_str).group().split('=')[1].strip(';'),
+            'JSESSIONID': jsessionid_pattern.search(cookie_str).group().split('=')[1].strip(';'),
+            'BIGipServerotn': bigipserverotn_pattern.search(cookie_str).group().split('=')[1].strip(';'),
+        }
+        return cookie_dict
+
+    def auth_qr_get(self, **kwargs):
+        """
+        认证-获取登录二维码
+        :return JSON对象
+        """
+        url = 'https://kyfw.12306.cn/passport/web/create-qr64'
+        params = {
+            'appid': 'otn'
+        }
+        resp = self.submit(url, params, method='POST', parse_resp=False, **kwargs)
+        if resp.status_code != 200:
+            raise exceptions.TrainRequestException(str(resp))
+        return json.loads(resp.content)
+
+    def auth_qr_check(self, uuid, **kwargs):
+        """
+        认证-检查二维码是否登录
+        :param uuid 获取二维码请求中返回的 UUID
+        :return COOKIES JSON 对象
+        """
+        assert isinstance(uuid, (str, unicode))
+
+        url = 'https://kyfw.12306.cn/passport/web/checkqr'
+        params = {
+            'uuid': uuid,
+            'appid': 'otn',
+        }
+        resp = self.submit(url, params, method='POST', parse_resp=False, **kwargs)
+        if resp.status_code != 200:
+            raise exceptions.TrainRequestException()
+
+        return json.loads(resp.content)
+
+    def auth_uamtk(self, uamtk, **kwargs):
+        """
+        认证-UAM流票
+        :param uamtk 流票
+        :return JSON 对象
+        """
+        url = 'https://kyfw.12306.cn/passport/web/auth/uamtk'
+        params = {
+            'uamtk': uamtk,
+            'appid': 'otn',
+        }
+        resp = self.submit(url, params, method='POST', parse_resp=False, **kwargs)
+        if resp.status_code != 200:
+            raise exceptions.TrainRequestException()
+
+        return json.loads(resp.content)
+
+    def auth_uamauth(self, apptk, **kwargs):
+        """
+        认证-UAM认证
+        :param apptk
+        :return TODO
+        """
+        url = 'https://kyfw.12306.cn/otn/uamauthclient'
+        params = {
+            'tk': apptk
+        }
+        resp = self.submit(url, params, method='POST', parse_resp=False, **kwargs)
+        if resp.status_code != 200:
+            raise exceptions.TrainRequestException()
+        return json.loads(resp.content)
+
     def credit_query_dishonest(self, **kwargs):
         """
         信用信息-失信已执行名单
@@ -161,7 +248,10 @@ class TrainApi(object):
         """
         url = 'http://kyfw.12306.cn/otn/confirmPassenger/getPassengerDTOs'
         resp = self.submit(url, method='POST', **kwargs)
-        return resp['data']['normal_passengers']
+        if 'data' in resp and 'normal_passengers' in resp['data']:
+            return resp['data']['normal_passengers']
+        else:
+            return []
 
     @check_login
     def user_addresses(self, **kwargs):
