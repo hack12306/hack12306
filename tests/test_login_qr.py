@@ -10,16 +10,15 @@ from PIL import Image
 from hack12306.api import TrainApi
 
 def test_loin_qr():
-    train_api = TrainApi()
-    result = train_api.auth_qr_get()
-    assert isinstance(result, dict)
-    qr_uuid = result['uuid']
-    print 'qr uuid. %s' % qr_uuid
-
-
-    qr_img_path = '/tmp/12306/login-qr-%s.jpeg' % uuid.uuid1().hex
     try:
+        train_api = TrainApi()
         cookie_dict = train_api.auth_init()
+
+        result = train_api.auth_qr_get(cookies=cookie_dict)
+        assert isinstance(result, dict)
+        qr_uuid = result['uuid']
+        print 'qr uuid. %s' % qr_uuid
+        qr_img_path = '/tmp/12306/login-qr-%s.jpeg' % uuid.uuid1().hex
 
         if not os.path.exists(os.path.dirname(qr_img_path)):
             os.makedirs(os.path.dirname(qr_img_path))
