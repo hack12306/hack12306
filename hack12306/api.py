@@ -27,7 +27,9 @@ def check_login(f):
         if not cookies:
             raise exceptions.TrainUserNotLogin()
 
-        args[0].user_check_login(**kwargs)
+        if not args[0].user_check_login(**kwargs):
+            raise exceptions.TrainUserNotLogin()
+
         return f(*args, **kwargs)
 
     return wrapper
