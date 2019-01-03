@@ -121,3 +121,9 @@ class TestTrainApi(object):
         result = train_api.auth_init()
         assert isinstance(result, dict)
         print json.dumps(result, ensure_ascii=False)
+
+    def test_info_query_left_tickets(self):
+        date_str = tomorrow().strftime('%Y-%m-%d')
+        result = train_api.info_query_left_tickets(date_str, 'VNP', 'SHH')
+        assert isinstance(result, list)
+        print json.dumps(result, ensure_ascii=False)

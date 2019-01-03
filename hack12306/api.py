@@ -312,6 +312,48 @@ class TrainApi(object):
         else:
             return []
 
+    def info_query_left_tickets(self, train_date,  from_station, to_station, purpose_codes='ADULT', **kwargs):
+        """
+        信息查询-余票查询
+        """
+        date_pattern = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        assert date_pattern.match(train_date), 'Invalid train_date param. %s' % train_date
+
+        url = 'https://kyfw.12306.cn/otn/leftTicket/queryZ'
+        params = [
+            ('leftTicketDTO.train_date', train_date),
+            ('leftTicketDTO.from_station', from_station),
+            ('leftTicketDTO.to_station',to_station),
+            ('purpose_codes', purpose_codes),
+        ]
+        resp = self.submit(url, params, method='GET', **kwargs)
+        if 'data' not in resp or 'result' not in resp['data']:
+            return []
+
+        trains = []
+        for train_s in resp['data']['result']:
+            train = train_s.split('|')
+            trains.append({
+                'remark': train[1],
+                'train_num': train[2],
+                'train_name': train[3],
+                'from_station': train[4],
+                'to_station': train[5],
+                'departure_time': train[8],     # 出发时间
+                'arrival_time': train[9],       # 到达时间
+                'duration': train[10],          # 历时
+                constants.SEAT_CATEGORY_BUSINESS_SEAT: train[32],
+                constants.SEAT_CATEGORY_FIRST_SEAT: train[31],
+                constants.SEAT_CATEGORY_SECONDE_SEAT: train[30],
+                # constants.SEAT_CATEGORY_HIGH_SLEEPER_SEAT: '--',    # TODO 高级软卧
+                constants.SEAT_CATEGORY_SOFT_SLEEPER_SEAT: train[23],
+                constants.SEAT_CATEGORY_HARD_SLEEPER_SEAT: train[28],
+                constants.SEAT_CATEGORY_SOFT_SEAT: train[24],
+                constants.SEAT_CATEGORY_HARD_SEAT: train[29],
+                constants.SEAT_CATEGORY_NO_SEAT: train[26],
+            })
+        return trains
+
     def info_query_station_trains(self, train_start_date, train_station_code, **kwargs):
         """
         信息查询-车站(车次)查询
