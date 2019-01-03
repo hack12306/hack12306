@@ -2,14 +2,16 @@
 
 import re
 import json
+import urllib
 import logging
+import datetime
 import requests
 import collections
 
 from . import settings
 from . import constants
 from . import exceptions
-from .utils import urlencode
+from .utils import urlencode, tomorrow, time_cst_format
 
 _logger = logging.getLogger('hack12306')
 
@@ -36,6 +38,7 @@ def check_login(f):
 
 
 class TrainApi(object):
+
     """
     12306 Train API.
     """
@@ -264,7 +267,160 @@ class TrainApi(object):
         return resp['data']['addresses']
 
     @check_login
-    def order_query(self, start_date, end_date, type='1', sequeue_train_name='', come_from_flag='my_order', query_where='G', **kwargs):
+    def order_submit_order(self, secret_str, train_date, query_from_station_name，query_to_station_name,
+                           purpose_codes='ADULT', tour_flag='dc', back_train_date=None, undefined=None,
+                           **kwargs):
+        """
+        订单-下单-提交订单
+        :param secret_str
+        :param train_date 乘车日期
+        :param back_train_date 返程日期
+        :param tour_flag
+        :param purpose_codes 默认为“ADULT”
+        :param query_from_station_name 查询车站名称
+        :param query_to_station_name 查询到站名称
+        :return Boolean True-成功  False-失败
+        """
+        date_pattern = re.compile(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        assert date_pattern.match(train_date), 'Invalid train_date param. %s' % train_date
+
+        if back_train_date:
+            assert date_pattern.match(back_train_date), 'Invalid back_train_date param. %s' % back_train_date
+        else:
+            back_train_date = tomorrow().strftime('%Y-%m-%d')
+
+        url = 'https://kyfw.12306.cn/otn/leftTicket/submitOrderRequest'
+        params = {
+            'secretStr': urllib.unquote(secret_str),
+            'train_date': train_date,
+            'back_train_date': back_train_date,
+            'tour_flag': tour_flag,
+            'purpose_codes': purpose_codes,
+            'query_from_station_name': query_from_station_name,
+            'query_to_station_name': query_to_station_name,
+            'undefined': undefined or ''
+        }
+        resp = self.submit(url, params, method='POST', parse_resp=False, **kwargs)
+        if resp.status_code == 200:
+            return True
+        else:
+            return False
+
+    @check_login
+    def order_confirm_passage(self, _json_att=None, **kwargs):
+        """
+        订单-下单-确认乘客初始化
+        :param _json_att
+        :return JSON 对象
+        """
+        url = 'https://kyfw.12306.cn/otn/confirmPassenger/initDc'
+        params = {
+            '_json_att': _json_att or ''
+        }
+        resp = self.submit(url, params, method='POST', parse_resp=False, **kwargs)
+        if resp.status_code != 200:
+            raise exceptions.TrainRequestException()
+
+        token_pattern = re.compile(r"var globalRepeatSubmitToken = '(\S+)'")
+        token = token_pattern.search(resp.content)
+
+        ticket_info_pattern = re.compile(r'var ticketInfoForPassengerForm=(\{.+\})?')
+        ticket_info = json.loads(ticket_info_pattern.search(resp.content).group(1).replace("'", '"' ))
+
+        order_request_params_pattern = re.compile(r'var orderRequestDTO=(\{.+\})?')
+        order_request_params = json.loads(order_request_params_name_pattern.search(resp.content).group(1).replace("'", '"'))
+
+        resp = {
+            'token': token,
+            'ticket_info': ticket_info,
+            'order_request_params': order_request_params,
+        }
+        return resp
+
+    def _gen_passager_ticket_tuple(self,seat_type, passage_type, name, id_type, id_no, mobile, **kwargs):
+        return tuple([seat_type, '0', passage_type, name, id_type, id_no, mobile, 'N'])
+
+    def _gen_old_passage_tuple(self, name, id_type, id_no, passager_type, kwargs):
+        return tuple([name, id_type, id_no, str(passager_type)+'_'])
+
+    @check_login
+    def order_confirm_passenger_check_order(self, token, passenger_ticket_tuple, old_passenger_tuple,  tour_flag='dc',
+                                            cancel_flag=2, bed_level_order_num='000000000000000000000000000000'
+                                            whatsSelect=0, _json_att=None, **kwargs):
+        """
+        订单-下单-确认乘客，检查订单
+        :param cancel_flag
+        :param bed_level_order_num
+        :param passenger_ticket_tuple
+        :param old_passenger_tuple
+        :param tour_flag
+        :param whatsSelect
+        :param _json_att
+        :param token
+        :return JSON 对象
+        """
+        assert isinstance(passenger_ticket_tuple, tuple), 'Invalid passenger_ticket_tuple param. %s' % passenger_ticket_tuple
+        assert isinstance(old_passenger_tuple, tuple), 'Invalid old_passenger_tuple param. %s' % old_passenger_tuple
+
+        url  = 'https://kyfw.12306.cn/otn/confirmPassenger/checkOrderInfo'
+        params = {
+            'cancel_flag': cancel_flag,
+            'bed_level_order_num': bed_level_order_num,
+            'passengerTicketStr': ','.join(passenger_ticket_tuple),
+            'oldPassengerStr': ','.join(old_passenger_tuple),
+            'tour_flag': tour_flag,
+            'randCode': '',
+            'whatsSelect': whatsSelect,
+            '_json_att': _json_att or '',
+            'REPEAT_SUBMIT_TOKEN': token
+        }
+        resp = self.submit(url, params, method='POST', **kwargs)
+        return resp['data']
+
+    @check_login
+    def order_confirm_passenger_get_queue_count(self, train_date, train_no, station_train_code, seat_type,
+                                                from_station_telecode, to_station_telecode, left_ticket,
+                                                purpose_codes,  train_location, token, _json_att=None, **kwargs):
+        """
+        订单-下单-确认乘客，获取排队数量
+        :param train_date CST格式时间
+        :param train_no
+        :param station_train_code
+        :param seat_type 席别
+        :param from_station_telecode 出发站编码
+        :param to_station_telecode 到站编码
+        :param left_ticket
+        :param purpose_codes
+        :param train_location
+        :param _json_att
+        :param token
+        :return JSON 对象
+        """
+        date_pattern = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        assert date_pattern.match(train_date), 'Invalid train_date param. %s' % train_date
+        train_date = time_cst_format(datetime.datetime.strptime(train_date,'%Y-%m-%d'))
+
+        url = 'https://kyfw.12306.cn/otn/confirmPassenger/getQueueCount'
+        params = {
+            'train_date': train_date,
+            'train_no': train_no,
+            'stationTrainCode': station_train_code,
+            'seatType': seat_type,
+            'fromStationTelecode': from_station_telecode,
+            'toStationTelecode': to_station_telecode,
+            'leftTicket': left_ticket,
+            'purpose_codes': purpose_codes,
+            'train_location': train_location,
+            '_json_att': _json_att or '',
+            'REPEAT_SUBMIT_TOKEN': token
+        }
+        resp = self.submit(url, params, method='POST', **kwargs)
+        return resp['daat']
+
+    @check_login
+    def order_query(
+            self, start_date, end_date, type='1', sequeue_train_name='', come_from_flag='my_order', query_where='G', **
+            kwargs):
         """
         订单-查询
         :param start_date 开始日期，格式YYYY-mm-dd
@@ -280,7 +436,8 @@ class TrainApi(object):
         assert date_pattern.match(start_date), 'invalid start_date params. %s' % start_date
         assert date_pattern.match(end_date), 'invalid end_date params. %s' % end_date
         assert type in dict(constants.ORDER_QUERY_TYPE), 'invalid type params. %s' % type
-        assert come_from_flag in dict(constants.ORDER_COME_FROM_FLAG), 'invalid come_from_flag params. %s' % come_from_flag
+        assert come_from_flag in dict(
+            constants.ORDER_COME_FROM_FLAG), 'invalid come_from_flag params. %s' % come_from_flag
         assert query_where in dict(constants.ORDER_WHERE), 'invalid query_where params. %s' % query_where
 
         url = 'https://kyfw.12306.cn/otn/queryOrder/queryMyOrder'
@@ -323,7 +480,7 @@ class TrainApi(object):
         params = [
             ('leftTicketDTO.train_date', train_date),
             ('leftTicketDTO.from_station', from_station),
-            ('leftTicketDTO.to_station',to_station),
+            ('leftTicketDTO.to_station', to_station),
             ('purpose_codes', purpose_codes),
         ]
         resp = self.submit(url, params, method='GET', **kwargs)
@@ -431,7 +588,7 @@ class TrainApi(object):
         """
         信息查询-车站列表
         :param station_version 版本号
-        :return TODO
+        :return JSON 数组
         """
         def _parse_stations(s):
             station_list = []
@@ -504,8 +661,10 @@ class TrainApi(object):
         :return TODO
         """
         date_pattern = re.compile('^[0-9]{4}[0-9]{2}[0-9]{2}$')
-        assert query_type in dict(constants.MEMBER_INFO_POINT_QUERY_TYPE).keys(), 'Invalid query_type param. %s' % query_type
-        assert isinstance(start_date, str) and date_pattern.match(start_date), 'Invalid start_date param. %s' % start_date
+        assert query_type in dict(
+            constants.MEMBER_INFO_POINT_QUERY_TYPE).keys(), 'Invalid query_type param. %s' % query_type
+        assert isinstance(start_date, str) and date_pattern.match(
+            start_date), 'Invalid start_date param. %s' % start_date
         assert isinstance(end_date, str) and date_pattern.match(end_date), 'Invalid end_date param. %s' % end_date
 
         url = 'https://cx.12306.cn/tlcx/memberInfo/pointSimpleQuery'

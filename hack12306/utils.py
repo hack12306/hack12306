@@ -36,3 +36,12 @@ def urlencode(params):
         query_string_list.append(urllib.urlencode({param[0]: param[1]}))
 
     return '&'.join(query_string_list)
+
+
+def time_cst_format(time):
+    """
+    格式化为 CST 格式时间
+    """
+    CST_FORMAT = '%a %b %d %Y %H:%M:%S GMT+0800 (China Standard Time)'
+    assert isinstance(time, datetime.datetime), 'Invalid time param. %s' % time
+    return time.strftime(CST_FORMAT)
