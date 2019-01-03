@@ -241,7 +241,7 @@ class TrainApi(object):
         return result
 
     @check_login
-    def user_contact(self, **kwargs):
+    def user_passengers(self, **kwargs):
         """
         用户-常用联系人信息
         :return JSON LIST

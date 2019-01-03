@@ -2,6 +2,7 @@
 
 import json
 import pytest
+import urllib
 import datetime
 from hack12306.api import TrainApi
 from hack12306.utils import tomorrow, today
@@ -10,15 +11,14 @@ from hack12306 import exceptions
 train_api = TrainApi()
 
 COOKIES = {
-    "BIGipServerotn": "1139802634.50210.0000",
-    "JSESSIONID": "A86467155C703BE970693459165C6179",
-    "tk": "8ZpzMsxgF3ZuuibLHcB-PZlCS3mwpwxv7JSskAnxh2h0",
     "route": "c5c62a339e7744272a54643b3be5bf64",
+    "JSESSIONID": "82F1EB598C160B71B87CBC02FD043A09",
+    "tk": "NE8kd-aWlmc_DTXXH9zm6zCItfjpzAAtBDU_0Qtyh2h0",
+    "BIGipServerotn": "854589962.64545.0000"
 }
 
 
 class TestTrainApi(object):
-
     """
     测试12306 API
     """
@@ -39,8 +39,8 @@ class TestTrainApi(object):
         assert isinstance(result, dict)
         print json.dumps(result, ensure_ascii=False)
 
-    def test_user_contact(self):
-        result = train_api.user_contact(cookies=COOKIES)
+    def test_user_passengers(self):
+        result = train_api.user_passengers(cookies=COOKIES)
         assert isinstance(result, list)
         print json.dumps(result, ensure_ascii=False)
 

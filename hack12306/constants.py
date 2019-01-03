@@ -23,13 +23,13 @@ MEMBER_INFO_POINT_QUERY_TYPE = (
     ('2', '支出明细'),
 )
 
-SEAT_CATEGORY_BUSINESS_SEAT = 'business_seat'               # 商务座
-SEAT_CATEGORY_FIRST_SEAT = 'first_seat'                     # 一等座
-SEAT_CATEGORY_SECONDE_SEAT = 'second_seat'                  # 二等座
-SEAT_CATEGORY_HIGH_SLEEPER_SEAT = 'high_soft_sleeper_seat'  # 高级软卧
-SEAT_CATEGORY_SOFT_SLEEPER_SEAT = 'soft_sleeper_seat'       # 软卧
-SEAT_CATEGORY_MOVING_SLEEPER_SEAT = 'moving_sleeper_seat'   # 动卧
-SEAT_CATEGORY_HARD_SLEEPER_SEAT = 'hard_sleeper_seat'       # 硬卧
-SEAT_CATEGORY_SOFT_SEAT = 'soft_seat'                       # 软座
-SEAT_CATEGORY_HARD_SEAT = 'hard_seat'                       # 硬座
-SEAT_CATEGORY_NO_SEAT = 'no_seat'                           # 无座
+SEAT_CATEGORY_BUSINESS_SEAT = u'商务座'
+SEAT_CATEGORY_FIRST_SEAT = u'一等座'
+SEAT_CATEGORY_SECONDE_SEAT = u'二等座'
+SEAT_CATEGORY_HIGH_SLEEPER_SEAT = u'高级软卧'
+SEAT_CATEGORY_SOFT_SLEEPER_SEAT = u'软卧'
+SEAT_CATEGORY_MOVING_SLEEPER_SEAT = u'动卧'
+SEAT_CATEGORY_HARD_SLEEPER_SEAT = u'硬卧'
+SEAT_CATEGORY_SOFT_SEAT = u'软座'
+SEAT_CATEGORY_HARD_SEAT = u'硬座'
+SEAT_CATEGORY_NO_SEAT = u'无座'
