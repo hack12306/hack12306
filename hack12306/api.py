@@ -38,7 +38,6 @@ def check_login(f):
 
 
 class TrainApi(object):
-
     """
     12306 Train API.
     """
@@ -267,7 +266,7 @@ class TrainApi(object):
         return resp['data']['addresses']
 
     @check_login
-    def order_submit_order(self, secret_str, train_date, query_from_station_name，query_to_station_name,
+    def order_submit_order(self, secret_str, train_date, query_from_station_name, query_to_station_name,
                            purpose_codes='ADULT', tour_flag='dc', back_train_date=None, undefined=None,
                            **kwargs):
         """
@@ -338,14 +337,16 @@ class TrainApi(object):
         return resp
 
     def _gen_passager_ticket_tuple(self,seat_type, passage_type, name, id_type, id_no, mobile, **kwargs):
-        return tuple([seat_type, '0', passage_type, name, id_type, id_no, mobile, 'N'])
+        l = [seat_type, '0', passage_type, name, id_type, id_no, mobile, 'N']
+        return tuple([str(i) for i in l])
 
     def _gen_old_passage_tuple(self, name, id_type, id_no, passager_type, kwargs):
-        return tuple([name, id_type, id_no, str(passager_type)+'_'])
+        l = [name, id_type, id_no, str(passager_type)+'_']
+        return tuple([str(i) for i in l])
 
     @check_login
-    def order_confirm_passenger_check_order(self, token, passenger_ticket_tuple, old_passenger_tuple,  tour_flag='dc',
-                                            cancel_flag=2, bed_level_order_num='000000000000000000000000000000'
+    def order_confirm_passenger_check_order(self, token, passenger_ticket_tuple, old_passenger_tuple, tour_flag='dc',
+                                            cancel_flag=2, bed_level_order_num='000000000000000000000000000000',
                                             whatsSelect=0, _json_att=None, **kwargs):
         """
         订单-下单-确认乘客，检查订单
@@ -491,6 +492,7 @@ class TrainApi(object):
         for train_s in resp['data']['result']:
             train = train_s.split('|')
             trains.append({
+                'secret': train[0],
                 'remark': train[1],
                 'train_num': train[2],
                 'train_name': train[3],

@@ -1,5 +1,9 @@
 # encoding: utf8
 
+"""
+二维码登录
+"""
+
 import os
 import time
 import uuid
@@ -8,6 +12,7 @@ import base64
 from PIL import Image
 
 from hack12306.api import TrainApi
+
 
 def test_loin_qr():
     try:
