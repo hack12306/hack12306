@@ -38,6 +38,7 @@ def check_login(f):
 
 
 class TrainApi(object):
+
     """
     12306 Train API.
     """
@@ -324,10 +325,10 @@ class TrainApi(object):
         token = token_pattern.search(resp.content)
 
         ticket_info_pattern = re.compile(r'var ticketInfoForPassengerForm=(\{.+\})?')
-        ticket_info = json.loads(ticket_info_pattern.search(resp.content).group(1).replace("'", '"' ))
+        ticket_info = json.loads(ticket_info_pattern.search(resp.content).group(1).replace("'", '"'))
 
         order_request_params_pattern = re.compile(r'var orderRequestDTO=(\{.+\})?')
-        order_request_params = json.loads(order_request_params_name_pattern.search(resp.content).group(1).replace("'", '"'))
+        order_request_params = json.loads(order_request_params_pattern.search(resp.content).group(1).replace("'", '"'))
 
         resp = {
             'token': token,
@@ -336,12 +337,12 @@ class TrainApi(object):
         }
         return resp
 
-    def _gen_passager_ticket_tuple(self,seat_type, passage_type, name, id_type, id_no, mobile, **kwargs):
+    def _gen_passager_ticket_tuple(self, seat_type, passage_type, name, id_type, id_no, mobile, **kwargs):
         l = [seat_type, '0', passage_type, name, id_type, id_no, mobile, 'N']
         return tuple([str(i) for i in l])
 
     def _gen_old_passage_tuple(self, name, id_type, id_no, passager_type, kwargs):
-        l = [name, id_type, id_no, str(passager_type)+'_']
+        l = [name, id_type, id_no, str(passager_type) + '_']
         return tuple([str(i) for i in l])
 
     @check_login
@@ -363,7 +364,7 @@ class TrainApi(object):
         assert isinstance(passenger_ticket_tuple, tuple), 'Invalid passenger_ticket_tuple param. %s' % passenger_ticket_tuple
         assert isinstance(old_passenger_tuple, tuple), 'Invalid old_passenger_tuple param. %s' % old_passenger_tuple
 
-        url  = 'https://kyfw.12306.cn/otn/confirmPassenger/checkOrderInfo'
+        url = 'https://kyfw.12306.cn/otn/confirmPassenger/checkOrderInfo'
         params = {
             'cancel_flag': cancel_flag,
             'bed_level_order_num': bed_level_order_num,
@@ -399,7 +400,7 @@ class TrainApi(object):
         """
         date_pattern = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
         assert date_pattern.match(train_date), 'Invalid train_date param. %s' % train_date
-        train_date = time_cst_format(datetime.datetime.strptime(train_date,'%Y-%m-%d'))
+        train_date = time_cst_format(datetime.datetime.strptime(train_date, '%Y-%m-%d'))
 
         url = 'https://kyfw.12306.cn/otn/confirmPassenger/getQueueCount'
         params = {
@@ -416,12 +417,11 @@ class TrainApi(object):
             'REPEAT_SUBMIT_TOKEN': token
         }
         resp = self.submit(url, params, method='POST', **kwargs)
-        return resp['daat']
+        return resp['data']
 
     @check_login
-    def order_query(
-            self, start_date, end_date, type='1', sequeue_train_name='', come_from_flag='my_order', query_where='G', **
-            kwargs):
+    def order_query(self, start_date, end_date, type='1', sequeue_train_name='',
+                    come_from_flag='my_order', query_where='G', **kwargs):
         """
         订单-查询
         :param start_date 开始日期，格式YYYY-mm-dd
