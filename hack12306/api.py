@@ -1,6 +1,7 @@
 # encoding: utf8
 
 import re
+import time
 import json
 import urllib
 import logging
@@ -15,7 +16,17 @@ from .utils import urlencode, tomorrow, time_cst_format
 
 _logger = logging.getLogger('hack12306')
 
-__all__ = ('TrainApi',)
+__all__ = ('TrainApi', 'gen_passenger_ticket_tuple', 'gen_old_passenge_tuple',)
+
+
+def gen_passenger_ticket_tuple(seat_type, passenger_flag, passenge_type, name, id_type, id_no, mobile, **kwargs):
+    l = [seat_type, passenger_flag, passenge_type, name, id_type, id_no, mobile, 'N']
+    return tuple([unicode(i).encode('utf8') for i in l])
+
+
+def gen_old_passenge_tuple(name, id_type, id_no, **kwargs):
+    l = [name, id_type, id_no, '1_']
+    return tuple([unicode(i).encode('utf8') for i in l])
 
 
 def check_login(f):
@@ -84,7 +95,8 @@ class TrainApi(object):
             raise exceptions.TrainRequestException('response is not valid json type')
 
         if content_json['status'] is not True:
-            raise exceptions.TrainAPIException(content_json.get('errMsg', json.dumps(content_json, ensure_ascii=False)))
+            _logger.warning('%s resp. %s' % (url, resp.content))
+            raise exceptions.TrainAPIException(resp.content)
 
         return content_json
 
@@ -267,7 +279,7 @@ class TrainApi(object):
         return resp['data']['addresses']
 
     @check_login
-    def order_submit_order(self, secret_str, train_date, query_from_station_name, query_to_station_name,
+    def order_submit_order(self, secret_str, train_date, query_from_station_name=None, query_to_station_name=None,
                            purpose_codes='ADULT', tour_flag='dc', back_train_date=None, undefined=None,
                            **kwargs):
         """
@@ -296,18 +308,18 @@ class TrainApi(object):
             'back_train_date': back_train_date,
             'tour_flag': tour_flag,
             'purpose_codes': purpose_codes,
-            'query_from_station_name': query_from_station_name,
-            'query_to_station_name': query_to_station_name,
+            'query_from_station_name': query_from_station_name or '',
+            'query_to_station_name': query_to_station_name or '',
             'undefined': undefined or ''
         }
-        resp = self.submit(url, params, method='POST', parse_resp=False, **kwargs)
-        if resp.status_code == 200:
+        resp = self.submit(url, params, method='POST', **kwargs)
+        if resp['httpstatus'] == 200 and resp['status'] is True:
             return True
         else:
-            return False
+            raise exceptions.TrainAPIException('submit order error. %s' % json.dumps(resp, ensure_ascii=False))
 
     @check_login
-    def order_confirm_passage(self, _json_att=None, **kwargs):
+    def order_confirm_passenger(self, _json_att=None, **kwargs):
         """
         订单-下单-确认乘客初始化
         :param _json_att
@@ -322,7 +334,7 @@ class TrainApi(object):
             raise exceptions.TrainRequestException()
 
         token_pattern = re.compile(r"var globalRepeatSubmitToken = '(\S+)'")
-        token = token_pattern.search(resp.content)
+        token = token_pattern.search(resp.content).group(1)
 
         ticket_info_pattern = re.compile(r'var ticketInfoForPassengerForm=(\{.+\})?')
         ticket_info = json.loads(ticket_info_pattern.search(resp.content).group(1).replace("'", '"'))
@@ -337,65 +349,59 @@ class TrainApi(object):
         }
         return resp
 
-    def _gen_passager_ticket_tuple(self, seat_type, passage_type, name, id_type, id_no, mobile, **kwargs):
-        l = [seat_type, '0', passage_type, name, id_type, id_no, mobile, 'N']
-        return tuple([str(i) for i in l])
-
-    def _gen_old_passage_tuple(self, name, id_type, id_no, passager_type, kwargs):
-        l = [name, id_type, id_no, str(passager_type) + '_']
-        return tuple([str(i) for i in l])
-
     @check_login
-    def order_confirm_passenger_check_order(self, token, passenger_ticket_tuple, old_passenger_tuple, tour_flag='dc',
+    def order_confirm_passenger_check_order(self, token, passenger_ticket, old_passenger, tour_flag='dc',
                                             cancel_flag=2, bed_level_order_num='000000000000000000000000000000',
-                                            whatsSelect=0, _json_att=None, **kwargs):
+                                            whatsSelect=1, _json_att=None, **kwargs):
         """
         订单-下单-确认乘客，检查订单
         :param cancel_flag
         :param bed_level_order_num
-        :param passenger_ticket_tuple
-        :param old_passenger_tuple
+        :param passenger_ticket
+        :param old_passenger
         :param tour_flag
         :param whatsSelect
         :param _json_att
         :param token
         :return JSON 对象
         """
-        assert isinstance(passenger_ticket_tuple, tuple), 'Invalid passenger_ticket_tuple param. %s' % passenger_ticket_tuple
-        assert isinstance(old_passenger_tuple, tuple), 'Invalid old_passenger_tuple param. %s' % old_passenger_tuple
+        assert isinstance(passenger_ticket, tuple), 'Invalid passenger_ticket_tuple param. %s' % passenger_ticket
+        assert isinstance(old_passenger, tuple), 'Invalid old_passenger_tuple param. %s' % old_passenger
 
         url = 'https://kyfw.12306.cn/otn/confirmPassenger/checkOrderInfo'
         params = {
             'cancel_flag': cancel_flag,
             'bed_level_order_num': bed_level_order_num,
-            'passengerTicketStr': ','.join(passenger_ticket_tuple),
-            'oldPassengerStr': ','.join(old_passenger_tuple),
+            'passengerTicketStr': ','.join(passenger_ticket),
+            'oldPassengerStr': ','.join(old_passenger),
             'tour_flag': tour_flag,
             'randCode': '',
             'whatsSelect': whatsSelect,
             '_json_att': _json_att or '',
             'REPEAT_SUBMIT_TOKEN': token
         }
+
         resp = self.submit(url, params, method='POST', **kwargs)
         return resp['data']
 
     @check_login
-    def order_confirm_passenger_get_queue_count(self, train_date, train_no, station_train_code, seat_type,
+    def order_confirm_passenger_get_queue_count(self, train_date, train_no, seat_type,
                                                 from_station_telecode, to_station_telecode, left_ticket,
-                                                purpose_codes,  train_location, token, _json_att=None, **kwargs):
+                                                token, station_train_code, purpose_codes, train_location,
+                                                _json_att=None, **kwargs):
         """
         订单-下单-确认乘客，获取排队数量
         :param train_date CST格式时间
         :param train_no
-        :param station_train_code
         :param seat_type 席别
         :param from_station_telecode 出发站编码
         :param to_station_telecode 到站编码
         :param left_ticket
+        :param token
+        :param station_train_code
         :param purpose_codes
         :param train_location
         :param _json_att
-        :param token
         :return JSON 对象
         """
         date_pattern = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
@@ -418,6 +424,90 @@ class TrainApi(object):
         }
         resp = self.submit(url, params, method='POST', **kwargs)
         return resp['data']
+
+    @check_login
+    def order_confirm_passenger_confirm_single_for_queue(self, passenger_ticket, old_passenger, purpose_codes,
+                                                         key_check_isChange, left_ticket, train_location,
+                                                         token, whats_select='1', dw_all='N', room_type=None, 
+                                                         seat_detail_type=None, choose_seats=None, _json_att=None, **kwargs):
+        """
+        订单-下单-确认乘客，确认车票
+        :param passenger_ticket
+        :param old_passenger
+        :param purpose_codes
+        :param key_check_isChange
+        :param left_ticket
+        :param train_location
+        :param choose_seats
+        :param seat_detail_type
+        :param whats_select
+        :param root_type
+        :param dw_all
+        :param _json_att
+        :param token
+        :return TODO
+        """
+        assert isinstance(passenger_ticket, (list, tuple)), 'Invalid passenger_ticket param. %s' % passenger_ticket
+        assert isinstance(old_passenger, (list, tuple)), 'Invalid old_passenger param. %s'  % old_passenger
+
+
+        url = 'https://kyfw.12306.cn/otn/confirmPassenger/confirmSingleForQueue'
+        params = {
+            'passengerTicketStr': passenger_ticket,
+            'oldPassengerStr':  old_passenger,
+            'randCode': '',
+            'purpose_codes': purpose_codes,
+            'key_check_isChange': key_check_isChange,
+            'leftTicketStr': left_ticket,
+            'train_location': train_location,
+            'choose_seats': choose_seats or '',
+            'seatDetailType': seat_detail_type,
+            'whatsSelect': whats_select,
+            'roomType': room_type,
+            'dwAll': dw_all,
+            '_json_att': _json_att or '',
+            'REPEAT_SUBMIT_TOKEN': token
+        }
+        resp = self.submit(url, params, method='POST', **kwargs)
+        return resp
+
+    @check_login
+    def order_confirm_passenger_query_order(self, token, tour_flag='dc', random=None, _json_att=None, **kwargs):
+        """
+        订单-下单-确认乘客，查询
+        :param random
+        :pram tour_flag
+        :pram token
+        :pram _json_att
+        """
+        random = random or str(int(time.time()*100))
+
+        url = 'https://kyfw.12306.cn/otn/confirmPassenger/queryOrderWaitTime'
+        params = [
+            ('random', random),
+            ('tourFlag', tour_flag),
+            ('_json_att', _json_att or ''),
+            ('REPEAT_SUBMIT_TOKEN', token),
+        ]
+        resp = self.submit(url, params, method='GET', **kwargs)
+        return resp
+
+    @check_login
+    def order_confirm_passenger_result_order(self, sequence_no, token, _json_att=None, **kwargs):
+        """
+        订单-下单-确认乘客，订单结果
+        :pram senquence_no
+        :param _json_att
+        :param token
+        """
+        url = 'https://kyfw.12306.cn/otn/confirmPassenger/resultOrderForDcQueue'
+        params = {
+            'orderSequence_no': sequence_no,
+            '_json_att': _json_att or '',
+            'REPEAT_SUBMIT_TOKEN': token,
+        }
+        resp = self.submit(url, params, method="POST", **kwargs)
+        return resp
 
     @check_login
     def order_query(self, start_date, end_date, type='1', sequeue_train_name='',
@@ -473,6 +563,10 @@ class TrainApi(object):
     def info_query_left_tickets(self, train_date,  from_station, to_station, purpose_codes='ADULT', **kwargs):
         """
         信息查询-余票查询
+        :param train_date 乘车日期
+        :param from_station 出发站
+        :param to_station 到达站
+        :return JSON 数组
         """
         date_pattern = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
         assert date_pattern.match(train_date), 'Invalid train_date param. %s' % train_date
@@ -501,15 +595,15 @@ class TrainApi(object):
                 'departure_time': train[8],     # 出发时间
                 'arrival_time': train[9],       # 到达时间
                 'duration': train[10],          # 历时
-                constants.SEAT_CATEGORY_BUSINESS_SEAT: train[32],
-                constants.SEAT_CATEGORY_FIRST_SEAT: train[31],
-                constants.SEAT_CATEGORY_SECONDE_SEAT: train[30],
-                # constants.SEAT_CATEGORY_HIGH_SLEEPER_SEAT: '--',    # TODO 高级软卧
-                constants.SEAT_CATEGORY_SOFT_SLEEPER_SEAT: train[23],
-                constants.SEAT_CATEGORY_HARD_SLEEPER_SEAT: train[28],
-                constants.SEAT_CATEGORY_SOFT_SEAT: train[24],
-                constants.SEAT_CATEGORY_HARD_SEAT: train[29],
-                constants.SEAT_CATEGORY_NO_SEAT: train[26],
+                constants.SEAT_TYPE_BUSINESS_SEAT: train[32],
+                constants.SEAT_TYPE_FIRST_SEAT: train[31],
+                constants.SEAT_TYPE_SECONDE_SEAT: train[30],
+                # constants.SEAT_TYPE_HIGH_SLEEPER_SEAT: '--',    # TODO 高级软卧
+                constants.SEAT_TYPE_SOFT_SLEEPER_SEAT: train[23],
+                constants.SEAT_TYPE_HARD_SLEEPER_SEAT: train[28],
+                constants.SEAT_TYPE_SOFT_SEAT: train[24],
+                constants.SEAT_TYPE_HARD_SEAT: train[29],
+                constants.SEAT_TYPE_NO_SEAT: train[26],
             })
         return trains
 

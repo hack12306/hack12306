@@ -8,14 +8,9 @@ from hack12306.api import TrainApi
 from hack12306.utils import tomorrow, today
 from hack12306 import exceptions
 
-train_api = TrainApi()
+from config import COOKIES
 
-COOKIES = {
-    "route": "c5c62a339e7744272a54643b3be5bf64",
-    "JSESSIONID": "82F1EB598C160B71B87CBC02FD043A09",
-    "tk": "NE8kd-aWlmc_DTXXH9zm6zCItfjpzAAtBDU_0Qtyh2h0",
-    "BIGipServerotn": "854589962.64545.0000"
-}
+train_api = TrainApi()
 
 
 class TestTrainApi(object):
@@ -58,6 +53,16 @@ class TestTrainApi(object):
         result = train_api.order_query_no_complete(cookies=COOKIES)
         assert isinstance(result, list)
         print json.dumps(result)
+
+    def test_order_query_order(self):
+        with pytest.raises(Exception):
+            result = train_api.order_confirm_passenger_query_order('823f08e65190e9a1d2e5051d15d5fcfc', 'dc', cookies=COOKIES)
+            print json.dumps(result, ensure_ascii=False)
+
+    def test_order_result_order(self):
+        with pytest.raises(Exception):
+            result = train_api.order_confirm_passenger_result_order('6487212804852849745', '823f08e65190e9a1d2e5051d15d5fcfc', cookies=COOKIES)
+            print json.dumps(result, ensure_ascii=False)
 
     def test_info_query_station_trains(self):
         today_str = datetime.date.today().strftime('%Y-%m-%d')
