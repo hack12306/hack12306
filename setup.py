@@ -15,7 +15,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/hack12306/hack12306",
     packages=setuptools.find_packages(),
-    install_requires=["requests>=2.12.4"],
+    install_requires=["requests>=2.12.4", "BeautifulSoup>=3.2.1"],
     classifiers=[
         "Programming Language :: Python :: 2",
         "License :: OSI Approved :: MIT License",

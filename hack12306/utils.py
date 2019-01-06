@@ -33,13 +33,17 @@ def today():
 
 
 def urlencode(params):
-    assert isinstance(params, list)
+    assert isinstance(params, (list, dict))
 
-    query_string_list = []
-    for param in params:
-        query_string_list.append(urllib.urlencode({param[0]: param[1]}))
-
-    return '&'.join(query_string_list)
+    if isinstance(params, list):
+        param_list = []
+        for param in params:
+            param_list.append(urllib.urlencode({param[0]: param[1]}))
+        return '&'.join(param_list)
+    elif isinstance(params, dict):
+        return urllib.urlencode(params)
+    else:
+        assert False, 'Unsupported type params'
 
 
 def time_cst_format(time):
