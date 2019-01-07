@@ -19,9 +19,6 @@ def test_pay():
     # 1.支付未完成订单
     pay_no_complete_order_result = train_pay_api.pay_no_complete_order(ORDER_SEQUENCE_NO, cookies=COOKIES)
     print 'pay no complete order result. %s' % json.dumps(pay_no_complete_order_result, ensure_ascii=False,)
-    if pay_no_complete_order_result['existError'] != 'N':
-        print '未找到未完成的订单'
-        return
 
     # 2.支付初始化
     train_pay_api.pay_init(cookies=COOKIES)
@@ -29,6 +26,11 @@ def test_pay():
     # 3.发起支付
     pay_check_new_result = train_pay_api.pay_check_new(cookies=COOKIES)
     print 'pay check new result. %s' % json.dumps(pay_check_new_result, ensure_ascii=False)
+
+    pay_gateway_result = train_pay_api.pay_gateway(
+        pay_check_new_result['payForm']['tranData'],
+        pay_check_new_result['payForm']['merSignMsg'],
+        cookies=COOKIES)
 
     # 4.交易
     pay_business_result = train_pay_api.pay_web_business(
@@ -44,9 +46,10 @@ def test_pay():
         pay_business_result['url'],
         pay_business_result['params'],
         method=pay_business_result['method'],
-        parse_resp=False, cookies=COOKIES)
+        parse_resp=False, cookies=COOKIES, allow_redirects=True)
     print 'pay third resp status code. %s' % pay_business_third_pay_resp.status_code
-    print 'pay third resp. %s' % pay_business_third_pay_resp.content
+    print 'pay third resp headers. location: %s' % pay_business_third_pay_resp.headers.get('Location', None)
+    # print 'pay third resp. %s' % pay_business_third_pay_resp.content
 
 
 if __name__ == '__main__':

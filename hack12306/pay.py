@@ -146,6 +146,7 @@ class TrainPayAPI(TrainBaseAPI):
         :param app_id
         :param interface_name
         :param interface_version
+        :return HTML
         """
         url = 'https://epay.12306.cn/pay/payGateway'
         params = {

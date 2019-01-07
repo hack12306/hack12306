@@ -187,7 +187,7 @@ class TrainOrderAPI(TrainBaseAPI):
         :param dw_all
         :param _json_att
         :param token
-        :return TODO
+        :return JSON对象
         """
         assert isinstance(passenger_ticket, (list, tuple)), 'Invalid passenger_ticket param. %s' % passenger_ticket
         assert isinstance(old_passenger, (list, tuple)), 'Invalid old_passenger param. %s'  % old_passenger
@@ -211,7 +211,7 @@ class TrainOrderAPI(TrainBaseAPI):
             'REPEAT_SUBMIT_TOKEN': token
         }
         resp = self.submit(url, params, method='POST', **kwargs)
-        return resp
+        return resp['data']
 
     @check_login
     def order_confirm_passenger_query_order(self, token, tour_flag='dc', random=None, _json_att=None, **kwargs):
@@ -232,7 +232,7 @@ class TrainOrderAPI(TrainBaseAPI):
             ('REPEAT_SUBMIT_TOKEN', token),
         ]
         resp = self.submit(url, params, method='GET', **kwargs)
-        return resp
+        return resp['data']
 
     @check_login
     def order_confirm_passenger_result_order(self, sequence_no, token, _json_att=None, **kwargs):
@@ -249,7 +249,7 @@ class TrainOrderAPI(TrainBaseAPI):
             'REPEAT_SUBMIT_TOKEN': token,
         }
         resp = self.submit(url, params, method="POST", **kwargs)
-        return resp
+        return resp['data']
 
     @check_login
     def order_query(self, start_date, end_date, type='1', sequeue_train_name='',
