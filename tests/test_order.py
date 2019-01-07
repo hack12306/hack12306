@@ -6,9 +6,13 @@
 
 import json
 import copy
-from hack12306.api import TrainApi, gen_old_passenge_tuple, gen_passenger_ticket_tuple
-from hack12306.utils import tomorrow, JSONEncoder
+
 from hack12306 import constants
+from hack12306.order import TrainOrderAPI
+from hack12306.query import TrainInfoQueryAPI
+from hack12306.user import TrainUserAPI
+from hack12306.utils import (tomorrow, JSONEncoder,
+                             gen_old_passenge_tuple, gen_passenger_ticket_tuple)
 
 from config import COOKIES
 
@@ -20,11 +24,11 @@ to_station = 'SHH'
 
 
 def test_order():
-    train_api = TrainApi()
+    train_order_api = TrainOrderAPI()
 
     # 1. 查询剩余车票
     train_date = tomorrow().strftime('%Y-%m-%d')
-    result = train_api.info_query_left_tickets(train_date, from_station, to_station)
+    result = TrainInfoQueryAPI().info_query_left_tickets(train_date, from_station, to_station)
     train_info = None
     for train in result:
         if train[constants.SEAT_TYPE_SECONDE_SEAT]:
@@ -34,15 +38,18 @@ def test_order():
     print 'query left tickets result. %s' % json.dumps(train_info, ensure_ascii=False)
 
     # 2. 下单-提交订单
-    submit_order_result = train_api.order_submit_order(train_info['secret'], train_info['train_date'], cookies=COOKIES)
+    submit_order_result = train_order_api.order_submit_order(
+        train_info['secret'],
+        train_info['train_date'],
+        cookies=COOKIES)
     print 'submit order result. %s' % submit_order_result
 
     # 3. 下单-确认乘客
-    confirm_passenger_result = train_api.order_confirm_passenger(cookies=COOKIES)
+    confirm_passenger_result = train_order_api.order_confirm_passenger(cookies=COOKIES)
     print 'confirm passenger result. %s' % json.dumps(confirm_passenger_result, ensure_ascii=False, cls=JSONEncoder)
 
     # 4. 下单-检查订单信息
-    passengers = train_api.user_passengers(cookies=COOKIES)
+    passengers = TrainUserAPI().user_passengers(cookies=COOKIES)
     passenger_info = passengers[0]
     passenger_ticket = gen_passenger_ticket_tuple(
         seat_type_code, passenger_info['passenger_flag'],
@@ -53,13 +60,13 @@ def test_order():
         passenger_info['mobile_no'])
     old_passenger = gen_old_passenge_tuple(passenger_info['passenger_name'], passenger_info['passenger_id_type_code'],
                                            passenger_info['passenger_id_no'])
-    check_order_result = train_api.order_confirm_passenger_check_order(
+    check_order_result = train_order_api.order_confirm_passenger_check_order(
         confirm_passenger_result['token'],
         passenger_ticket, old_passenger, cookies=COOKIES)
     print 'check order result. %s' % json.dumps(check_order_result, ensure_ascii=False, cls=JSONEncoder)
 
     # 5. 下单-获取排队数量
-    queue_count_result = train_api.order_confirm_passenger_get_queue_count(
+    queue_count_result = train_order_api.order_confirm_passenger_get_queue_count(
         train_info['train_date'],
         train_info['train_num'],
         seat_type_code,
@@ -76,7 +83,7 @@ def test_order():
 
     if confirm_submit_order:
         # 6. 下单-确认车票
-        confirm_ticket_result = train_api.order_confirm_passenger_confirm_single_for_queue(
+        confirm_ticket_result = train_order_api.order_confirm_passenger_confirm_single_for_queue(
             passenger_ticket, old_passenger,
             confirm_passenger_result['ticket_info']['queryLeftTicketRequestDTO']['purpose_codes'],
             confirm_passenger_result['ticket_info']['key_check_isChange'],
@@ -86,7 +93,7 @@ def test_order():
         print 'confirm passenger confirm ticket result. %s' % json.dumps(confirm_ticket_result, ensure_ascii=False, cls=JSONEncoder)
 
         # 7. 下单-查询订单
-        query_order_result = train_api.order_confirm_passenger_query_order(confirm_passenger_result['token'])
+        query_order_result = train_order_api.order_confirm_passenger_query_order(confirm_passenger_result['token'])
         print 'confirm passenger query order result. %s' % json.dumps(query_order_result, ensure_ascii=False, cls=JSONEncoder)
 
 
