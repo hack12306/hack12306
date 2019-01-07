@@ -14,6 +14,7 @@ def cookie_str_to_dict(cookie_str):
         cookies.append(cookie.split('='))
     return dict(cookies)
 
+
 def get_cookie_from_str(cookie_str):
     cookie_dict = cookie_str_to_dict(cookie_str)
     return {
@@ -56,10 +57,12 @@ def time_cst_format(time):
 
 
 class JSONEncoder(json.JSONEncoder):
+
     """
     JSONEncoder subclass that knows how to encode date/time/timedelta,
     decimal types, generators and other basic python objects.
     """
+
     def default(self, obj):
         if isinstance(obj, datetime.datetime):
             representation = obj.isoformat()
@@ -92,3 +95,14 @@ class JSONEncoder(json.JSONEncoder):
         elif hasattr(obj, '__iter__'):
             return tuple(item for item in obj)
         return super(JSONEncoder, self).default(obj)
+
+
+def gen_passenger_ticket_tuple(seat_type, passenger_flag, passenge_type,
+                               name, id_type, id_no, mobile, **kwargs):
+    l = [seat_type, passenger_flag, passenge_type, name, id_type, id_no, mobile, 'N']
+    return tuple([unicode(i).encode('utf8') for i in l])
+
+
+def gen_old_passenge_tuple(name, id_type, id_no, **kwargs):
+    l = [name, id_type, id_no, '1_']
+    return tuple([unicode(i).encode('utf8') for i in l])

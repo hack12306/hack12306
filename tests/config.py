@@ -1,10 +1,10 @@
 # encoding: utf8
 
 COOKIES = {
-    "JSESSIONID": "5EEEF77A99E52DA7D7E8DB3BE6979B49",
-    "tk": "6JbivgaHHdrfYugbJrIJj_Zn5Z82NyJwsdh1h0",
-    "route": "9036359bb8a8a461c164a04f8f50b252",
-    "BIGipServerotn": "1106248202.50210.0000"
+    "route": "c5c62a339e7744272a54643b3be5bf64",
+    "JSESSIONID": "C1D456E78CA9BD857C32C08AF4BF100D",
+    "tk": "wUIW6PdfblS2Lk0lWccgC2KnVlvzrBwloZu-ogplh1h0",
+    "BIGipServerotn": "1072693770.64545.0000"
 }
 
 PUBLIC_IP_ADDR = '221.219.218.131'
