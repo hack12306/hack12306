@@ -4,6 +4,7 @@
 支付
 """
 
+import os
 import json
 import copy
 from hack12306 import constants
@@ -42,14 +43,27 @@ def test_pay():
     print 'pay business result. %s' % json.dumps(pay_business_result, ensure_ascii=False)
 
     # 5.跳转第三方支付
-    pay_business_third_pay_resp = train_pay_api.submit(
-        pay_business_result['url'],
-        pay_business_result['params'],
-        method=pay_business_result['method'],
-        parse_resp=False, cookies=COOKIES, allow_redirects=True)
-    print 'pay third resp status code. %s' % pay_business_third_pay_resp.status_code
-    print 'pay third resp headers. location: %s' % pay_business_third_pay_resp.headers.get('Location', None)
-    # print 'pay third resp. %s' % pay_business_third_pay_resp.content
+    try:
+        pay_filepath = '/tmp/12306/pay-%s-%s.html' % (constants.BANK_ID_WX, ORDER_SEQUENCE_NO)
+
+        pay_business_third_pay_resp = train_pay_api.submit(
+            pay_business_result['url'],
+            pay_business_result['params'],
+            method=pay_business_result['method'],
+            parse_resp=False, cookies=COOKIES, allow_redirects=True)    # 如果希望第三方支付返回302重定向，设置allow_redirects=False
+        print 'pay third resp status code. %s' % pay_business_third_pay_resp.status_code
+        print 'pay third resp headers. location: %s' % pay_business_third_pay_resp.headers.get('Location', None)
+        print 'pay third resp headers. %s' % json.dumps(pay_business_third_pay_resp.headers, ensure_ascii=False, cls=JSONEncoder)
+
+        # 响应输出的文件，用浏览器打开
+        if not os.path.exists(os.path.dirname(pay_filepath)):
+            os.makedirs(os.path.dirname(pay_filepath))
+
+        with open(pay_filepath, 'w') as f:
+            f.write(pay_business_third_pay_resp.content)
+    finally:
+        if os.path.exists(pay_filepath):
+            os.remove(pay_filepath)
 
 
 if __name__ == '__main__':
