@@ -14,7 +14,7 @@ class TrainInfoQueryAPI(TrainBaseAPI):
     信息查询
     """
 
-    def info_query_left_tickets(self, train_date,  from_station, to_station, purpose_codes='ADULT', **kwargs):
+    def info_query_left_tickets(self, train_date, from_station, to_station, purpose_codes='ADULT', **kwargs):
         """
         信息查询-余票查询
         :param train_date 乘车日期
@@ -25,7 +25,7 @@ class TrainInfoQueryAPI(TrainBaseAPI):
         date_pattern = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
         assert date_pattern.match(train_date), 'Invalid train_date param. %s' % train_date
 
-        url = 'https://kyfw.12306.cn/otn/leftTicket/queryZ'
+        url = 'https://kyfw.12306.cn/otn/leftTicket/queryO'
         params = [
             ('leftTicketDTO.train_date', train_date),
             ('leftTicketDTO.from_station', from_station),

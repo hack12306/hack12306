@@ -5,9 +5,9 @@ import pytest
 import urllib
 import datetime
 
+from hack12306 import exceptions
 from hack12306.query import TrainInfoQueryAPI
 from hack12306.utils import tomorrow, today
-from hack12306 import exceptions
 
 from config import COOKIES
 
@@ -46,4 +46,8 @@ class TestTrainInfoQueryAPI(object):
     def test_info_query_station_by_name(self):
         result = train_info_query_api.info_query_station_by_name('北京西')
         assert isinstance(result, dict)
+        print json.dumps(result, ensure_ascii=False)
+
+    def test_info_query_left_tickets(self):
+        result = train_info_query_api.info_query_left_tickets('2019-01-10', 'VNP', 'SHH')
         print json.dumps(result, ensure_ascii=False)
