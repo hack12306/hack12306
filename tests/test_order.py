@@ -22,7 +22,7 @@ to_station = 'SHH'
 def test_order():
     train_api = TrainApi()
 
-    # 1. 查询车票余额
+    # 1. 查询剩余车票
     train_date = tomorrow().strftime('%Y-%m-%d')
     result = train_api.info_query_left_tickets(train_date, from_station, to_station)
     train_info = None
