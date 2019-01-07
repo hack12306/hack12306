@@ -564,6 +564,36 @@ class TrainApi(object):
             return []
 
     @check_login
+    def pay_no_complete_order(self, sequence_no, arrive_time_str=None, pay_flag='pay', **kwargs):
+        """
+        支付-未完成订单
+        :param sequence_no 订单号
+        :param arrive_time_str
+        :param pay_flag
+        """
+        url = "https://kyfw.12306.cn/otn/queryOrder/continuePayNoCompleteMyOrder"
+        params = {
+            'sequence_no': sequence_no,
+            'pay_flag': pay_flag,
+            'arrive_time_str': arrive_time_str or ''
+        }
+        resp = self.submit(url, params, method='POST', **kwargs)
+        return resp['data']
+
+    def pay_init(self, **kwargs):
+        """
+        支付-订单支付初始化
+        :return HTML
+        """
+        url = 'https://kyfw.12306.cn/otn/payOrder/init'
+
+        resp = self.submit(url,method='GET', parse_resp=False, **kwargs)
+        if resp.status_code != 200:
+            raise exceptions.TrainRequestException()
+
+        return resp.content
+
+    @check_login
     def pay_check_new(self, **kwargs):
         """
         支付-发起支付
@@ -718,9 +748,15 @@ class TrainApi(object):
             'businessType': business_type
         }
         resp = self.submit(url, params, method='POST', parse_resp=False, **kwargs)
+        _logger.info('pay web business resp. status_code: %s content:%s' % (resp.status_code, resp.content))
+
         if resp.status_code != 200:
             raise exceptions.TrainRequestException(str(resp))
-''
+
+        failure_pattern = re.compile('交易失败')
+        if failure_pattern.search(resp.content):
+            raise exceptions.TrainAPIException(resp.content)
+
         url, method, params = parse_resp(resp.content)
         return {
             'url': url,

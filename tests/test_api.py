@@ -132,3 +132,11 @@ class TestTrainApi(object):
         result = train_api.info_query_left_tickets(date_str, 'VNP', 'SHH')
         assert isinstance(result, list)
         print json.dumps(result, ensure_ascii=False)
+
+    def test_pay_no_complete_order(self):
+        result = train_api.pay_no_complete_order('EH74940602', cookies=COOKIES)
+        print json.dumps(result, ensure_ascii=False)
+
+    def test_pay_init(self,):
+        resp = train_api.pay_init(cookies=COOKIES)
+        print resp
