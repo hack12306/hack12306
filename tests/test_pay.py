@@ -7,6 +7,7 @@
 import os
 import json
 import copy
+import platform
 from hack12306 import constants
 from hack12306.pay import TrainPayAPI
 from hack12306.utils import tomorrow, JSONEncoder
@@ -62,8 +63,12 @@ def test_pay():
         with open(pay_filepath, 'w') as f:
             f.write(pay_business_third_pay_resp.content)
     finally:
-        if os.path.exists(pay_filepath):
-            os.remove(pay_filepath)
+        if platform.mac_ver()[0]:
+            # 浏览器打开支付页面
+            os.system('open %s' % pay_filepath)
+        else:
+            if os.path.exists(pay_filepath):
+                os.remove(pay_filepath)
 
 
 if __name__ == '__main__':
