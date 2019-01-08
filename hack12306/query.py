@@ -1,3 +1,11 @@
+"""
+query.py
+@author Meng.yangyang
+@description 信息查询
+@created Mon Jan 07 2019 13:17:16 GMT+0800 (CST)
+@last-modified Tue Jan 08 2019 18:28:20 GMT+0800 (CST)
+"""
+
 # encoding: utf8
 
 import re
