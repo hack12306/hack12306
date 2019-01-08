@@ -1,13 +1,12 @@
+# encoding: utf8
 """
 constants.py
 @author Meng.yangyang
-@description 常量，枚举
+@description constants and enum
 @created Sat Dec 29 2018 12:04:04 GMT+0800 (CST)
-@last-modified Tue Jan 08 2019 18:30:01 GMT+0800 (CST)
+@last-modified Tue Jan 08 2019 19:46:39 GMT+0800 (CST)
 """
 
-
-# encoding: utf8
 
 ORDER_COME_FROM_FLAG = (
     ('my_order', '全部'),

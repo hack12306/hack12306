@@ -1,13 +1,11 @@
+# encoding: utf8
 """
 exceptions.py
 @author Meng.yangyang
-@description 异常
+@description Exception
 @created Wed Dec 26 2018 23:41:08 GMT+0800 (CST)
-@last-modified Tue Jan 08 2019 18:30:11 GMT+0800 (CST)
+@last-modified Tue Jan 08 2019 19:47:00 GMT+0800 (CST)
 """
-
-# encoding: utf8
-
 
 class TrainBaseException(Exception):
     """
