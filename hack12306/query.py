@@ -4,7 +4,7 @@ query.py
 @author Meng.yangyang
 @description info query
 @created Mon Jan 07 2019 13:17:16 GMT+0800 (CST)
-@last-modified Tue Jan 08 2019 19:47:09 GMT+0800 (CST)
+@last-modified Wed Jan 09 2019 12:07:03 GMT+0800 (CST)
 """
 
 import re
@@ -159,10 +159,10 @@ class TrainInfoQueryAPI(TrainBaseAPI):
             for station in s_list:
                 station_tuple = tuple(station.split('|'))
                 station_list.append({
-                    'name': station_tuple[1],
-                    'short_name': station_tuple[0],
-                    'code': station_tuple[2],
-                    'english_name': station_tuple[3],
+                    'name': station_tuple[1].decode('utf8'),
+                    'short_name': unicode(station_tuple[0]),
+                    'code': unicode(station_tuple[2]),
+                    'english_name': unicode(station_tuple[3]),
                     'index': station_tuple[5]
                 })
             return station_list

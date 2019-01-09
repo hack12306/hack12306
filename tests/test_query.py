@@ -44,7 +44,7 @@ class TestTrainInfoQueryAPI(object):
         print json.dumps(result[0], ensure_ascii=False)
 
     def test_info_query_station_by_name(self):
-        result = train_info_query_api.info_query_station_by_name('北京西')
+        result = train_info_query_api.info_query_station_by_name(u'北京西')
         assert isinstance(result, dict)
         print json.dumps(result, ensure_ascii=False)
 
