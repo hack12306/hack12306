@@ -65,9 +65,12 @@ def test_order():
         passenger_info['mobile_no'])
     old_passenger = gen_old_passenge_tuple(passenger_info['passenger_name'], passenger_info['passenger_id_type_code'],
                                            passenger_info['passenger_id_no'], passenger_info['passenger_type'])
+
+    passenger_ticket_str = ','.join(passenger_ticket)
+    old_passenger_str = ','.join(old_passenger)
     check_order_result = train_order_api.order_confirm_passenger_check_order(
         confirm_passenger_result['token'],
-        ','.join(passenger_ticket), ','.join(old_passenger), cookies=COOKIES)
+        passenger_ticket_str, old_passenger_str, cookies=COOKIES)
     print 'check order result. %s' % json.dumps(check_order_result, ensure_ascii=False, cls=JSONEncoder)
 
     # 5. 下单-获取排队数量
@@ -89,7 +92,7 @@ def test_order():
     if confirm_submit_order:
         # 6. 下单-确认车票
         confirm_ticket_result = train_order_api.order_confirm_passenger_confirm_single_for_queue(
-            passenger_ticket, old_passenger,
+            passenger_ticket_str, old_passenger_str,
             confirm_passenger_result['ticket_info']['queryLeftTicketRequestDTO']['purpose_codes'],
             confirm_passenger_result['ticket_info']['key_check_isChange'],
             confirm_passenger_result['ticket_info']['leftTicketStr'],

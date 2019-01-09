@@ -4,7 +4,7 @@ order.py
 @author Meng.yangyang
 @description Order
 @created Mon Jan 07 2019 13:17:16 GMT+0800 (CST)
-@last-modified Wed Jan 09 2019 18:22:00 GMT+0800 (CST)
+@last-modified Wed Jan 09 2019 22:02:43 GMT+0800 (CST)
 """
 
 import re
@@ -173,7 +173,7 @@ class TrainOrderAPI(TrainBaseAPI):
         return resp['data']
 
     @check_login
-    def order_confirm_passenger_confirm_single_for_queue(self, passenger_ticket, old_passenger, purpose_codes,
+    def order_confirm_passenger_confirm_single_for_queue(self, passenger_ticket_str, old_passenger_str, purpose_codes,
                                                          key_check_isChange, left_ticket, train_location,
                                                          token, whats_select='1', dw_all='N', room_type=None, 
                                                          seat_detail_type=None, choose_seats=None, _json_att=None, **kwargs):
@@ -194,14 +194,10 @@ class TrainOrderAPI(TrainBaseAPI):
         :param token
         :return JSON对象
         """
-        assert isinstance(passenger_ticket, (list, tuple)), 'Invalid passenger_ticket param. %s' % passenger_ticket
-        assert isinstance(old_passenger, (list, tuple)), 'Invalid old_passenger param. %s'  % old_passenger
-
-
         url = 'https://kyfw.12306.cn/otn/confirmPassenger/confirmSingleForQueue'
         params = {
-            'passengerTicketStr': passenger_ticket,
-            'oldPassengerStr':  old_passenger,
+            'passengerTicketStr': passenger_ticket_str,
+            'oldPassengerStr':  old_passenger_str,
             'randCode': '',
             'purpose_codes': purpose_codes,
             'key_check_isChange': key_check_isChange,
