@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="hack12306",
-    version="0.1.3",
+    version="0.1.4",
     author="Meng.yangyang",
     author_email="mengyy_linux@163.com",
     description="Hack 12306",
