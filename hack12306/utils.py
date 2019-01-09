@@ -4,7 +4,7 @@ utils.py
 @author Meng.yangyang
 @description Util functions
 @created Mon Jan 07 2019 13:17:16 GMT+0800 (CST)
-@last-modified Tue Jan 08 2019 19:47:26 GMT+0800 (CST)
+@last-modified Wed Jan 09 2019 18:03:01 GMT+0800 (CST)
 """
 
 import six
@@ -104,12 +104,12 @@ class JSONEncoder(json.JSONEncoder):
         return super(JSONEncoder, self).default(obj)
 
 
-def gen_passenger_ticket_tuple(seat_type, passenger_flag, passenge_type,
+def gen_passenger_ticket_tuple(seat_type, passenger_flag, passenger_type,
                                name, id_type, id_no, mobile, **kwargs):
-    l = [seat_type, passenger_flag, passenge_type, name, id_type, id_no, mobile, 'N']
+    l = [seat_type, passenger_flag, passenger_type, name, id_type, id_no, mobile, 'N']
     return tuple([unicode(i).encode('utf8') for i in l])
 
 
-def gen_old_passenge_tuple(name, id_type, id_no, **kwargs):
-    l = [name, id_type, id_no, '1_']
+def gen_old_passenge_tuple(name, id_type, id_no, passenger_type, **kwargs):
+    l = [name, id_type, id_no,  str(passenger_type)+'_']
     return tuple([unicode(i).encode('utf8') for i in l])

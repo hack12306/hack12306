@@ -64,7 +64,7 @@ def test_order():
         passenger_info['passenger_id_no'],
         passenger_info['mobile_no'])
     old_passenger = gen_old_passenge_tuple(passenger_info['passenger_name'], passenger_info['passenger_id_type_code'],
-                                           passenger_info['passenger_id_no'])
+                                           passenger_info['passenger_id_no'], passenger_info['passenger_type'])
     check_order_result = train_order_api.order_confirm_passenger_check_order(
         confirm_passenger_result['token'],
         passenger_ticket, old_passenger, cookies=COOKIES)
