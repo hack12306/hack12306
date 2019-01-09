@@ -23,6 +23,11 @@ from_station = 'VNP'
 to_station = 'SHH'
 
 
+def test_order_no_complete():
+    result = TrainOrderAPI().order_query_no_complete(cookies=COOKIES)
+    print json.dumps(result, ensure_ascii=False)
+
+
 def test_order():
     train_order_api = TrainOrderAPI()
 

@@ -1,8 +1,8 @@
 # encoding: utf8
 
 COOKIES = {
-    "JSESSIONID": "7963AEE185B373895125CF122DF87281",
-    "tk": "cHaEs6oYXoveE1c4kYxo71_7xDWjNvmQLzGCigzih2h0",
+    "JSESSIONID": "A85E3C4D69D7F323CDE54B174F0E7FA6",
+    "tk": "hASyOiZRimyME4vqNIhF1_2sDO_rDEUYb8WoTgkoh1h0",
     "route": "495c805987d0f5c8c84b14f60212447d",
     "BIGipServerotn": "837812746.64545.0000"
 }

@@ -4,7 +4,7 @@ order.py
 @author Meng.yangyang
 @description Order
 @created Mon Jan 07 2019 13:17:16 GMT+0800 (CST)
-@last-modified Tue Jan 08 2019 19:47:02 GMT+0800 (CST)
+@last-modified Wed Jan 09 2019 15:42:02 GMT+0800 (CST)
 """
 
 import re
@@ -304,7 +304,7 @@ class TrainOrderAPI(TrainBaseAPI):
         """
         url = 'https://kyfw.12306.cn/otn/queryOrder/queryMyOrderNoComplete'
         resp = self.submit(url, method='POST', **kwargs)
-        if 'data' in resp and 'OrderDTODataList' in resp['data']:
-            return resp['data']['OrderDTODataList']
+        if 'data' in resp and 'orderDBList' in resp['data']:
+            return resp['data']['orderDBList']
         else:
             return []
