@@ -4,7 +4,7 @@ constants.py
 @author Meng.yangyang
 @description constants and enum
 @created Sat Dec 29 2018 12:04:04 GMT+0800 (CST)
-@last-modified Tue Jan 08 2019 19:46:39 GMT+0800 (CST)
+@last-modified Wed Jan 09 2019 15:19:17 GMT+0800 (CST)
 """
 
 
@@ -42,18 +42,17 @@ SEAT_TYPE_SOFT_SEAT = u'软座'
 SEAT_TYPE_HARD_SEAT = u'硬座'
 SEAT_TYPE_NO_SEAT = u'无座'
 
-# TODO
 SEAT_TYPE_CODE_MAP = [
-    (SEAT_TYPE_BUSINESS_SEAT, ''),
-    (SEAT_TYPE_FIRST_SEAT, ''),
+    (SEAT_TYPE_BUSINESS_SEAT, '9'),
+    (SEAT_TYPE_FIRST_SEAT, 'M'),
     (SEAT_TYPE_SECONDE_SEAT, 'O'),
-    (SEAT_TYPE_HIGH_SLEEPER_SEAT, ''),
+    (SEAT_TYPE_HIGH_SLEEPER_SEAT, ''),  # TODO
     (SEAT_TYPE_SOFT_SLEEPER_SEAT, '4'),
     (SEAT_TYPE_MOVING_SLEEPER_SEAT, ''),
-    (SEAT_TYPE_HARD_SLEEPER_SEAT, ''),
-    (SEAT_TYPE_SOFT_SEAT, ''),
-    (SEAT_TYPE_HARD_SEAT, ''),
-    (SEAT_TYPE_NO_SEAT, ''),
+    (SEAT_TYPE_HARD_SLEEPER_SEAT, '3'),
+    (SEAT_TYPE_SOFT_SEAT, '2'),
+    (SEAT_TYPE_HARD_SEAT, '1'),
+    (SEAT_TYPE_NO_SEAT, '1'),
 ]
 
 TICKET_TYPE_ADULT = 1
