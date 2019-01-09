@@ -67,7 +67,7 @@ def test_order():
                                            passenger_info['passenger_id_no'], passenger_info['passenger_type'])
     check_order_result = train_order_api.order_confirm_passenger_check_order(
         confirm_passenger_result['token'],
-        passenger_ticket, old_passenger, cookies=COOKIES)
+        ','.join(passenger_ticket), ','.join(old_passenger), cookies=COOKIES)
     print 'check order result. %s' % json.dumps(check_order_result, ensure_ascii=False, cls=JSONEncoder)
 
     # 5. 下单-获取排队数量

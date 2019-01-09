@@ -4,7 +4,7 @@ order.py
 @author Meng.yangyang
 @description Order
 @created Mon Jan 07 2019 13:17:16 GMT+0800 (CST)
-@last-modified Wed Jan 09 2019 15:42:02 GMT+0800 (CST)
+@last-modified Wed Jan 09 2019 18:22:00 GMT+0800 (CST)
 """
 
 import re
@@ -99,30 +99,28 @@ class TrainOrderAPI(TrainBaseAPI):
         return resp
 
     @check_login
-    def order_confirm_passenger_check_order(self, token, passenger_ticket, old_passenger, tour_flag='dc',
+    def order_confirm_passenger_check_order(self, token, passenger_ticket_str, old_passenger_str, tour_flag='dc',
                                             cancel_flag=2, bed_level_order_num='000000000000000000000000000000',
                                             whatsSelect=1, _json_att=None, **kwargs):
         """
         订单-下单-确认乘客，检查订单
         :param cancel_flag
         :param bed_level_order_num
-        :param passenger_ticket
-        :param old_passenger
+        :param passenger_ticket_str
+        :param old_passenger_str
         :param tour_flag
         :param whatsSelect
         :param _json_att
         :param token
         :return JSON 对象
         """
-        assert isinstance(passenger_ticket, tuple), 'Invalid passenger_ticket_tuple param. %s' % passenger_ticket
-        assert isinstance(old_passenger, tuple), 'Invalid old_passenger_tuple param. %s' % old_passenger
 
         url = 'https://kyfw.12306.cn/otn/confirmPassenger/checkOrderInfo'
         params = {
             'cancel_flag': cancel_flag,
             'bed_level_order_num': bed_level_order_num,
-            'passengerTicketStr': ','.join(passenger_ticket),
-            'oldPassengerStr': ','.join(old_passenger),
+            'passengerTicketStr': passenger_ticket_str,
+            'oldPassengerStr': old_passenger_str,
             'tour_flag': tour_flag,
             'randCode': '',
             'whatsSelect': whatsSelect,
