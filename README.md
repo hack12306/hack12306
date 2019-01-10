@@ -70,7 +70,7 @@ python tests/test_auth.py;
 python tests/test_order.py;
 python tests/test_pay.py;
 ```
-> 测试订单模块，需要配置`tests.config::COOKIES`, 测试支付时，需要配置`tests.config::ORDER_SEQUENCE_NO`
+> 测试订单模块，需要配置`tests.config::COOKIES`, 测试支付模块，需要配置`tests.config::ORDER_SEQUENCE_NO`
 
 ## 集成
 
