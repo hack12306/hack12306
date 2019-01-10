@@ -77,3 +77,9 @@ python tests/test_pay.py;
 ```sh
 pip install hack12306 -U --user;
 ```
+
+## 赞助
+
+如果该项目有帮助到你，请扫描二维码赞赏我们，你的鼓励是我们持续改进优化的动力。
+
+<img src="https://share-static.oss-cn-hangzhou.aliyuncs.com/wx/%E5%BE%AE%E4%BF%A1%E8%B5%9E%E8%B5%8F.jpg"  width="50%" height="50%" />
