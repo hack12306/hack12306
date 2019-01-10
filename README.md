@@ -41,20 +41,17 @@ hack12306
 * hack12306/constangs.py 常量、枚举、状态等
 * tests 测试用例
 
-## 功能使用说明
+## 使用说明
 
 用户认证（二维码）-> 查询余票 -> 提交订单 -> 支付订单
 
 * 用户认证流程
-
 ![](http://processon.com/chart_image/5c2c2b92e4b0fa03ce872c0b.png)
 
 * 提交订单流程
-
 ![](http://processon.com/chart_image/5c32a837e4b048f108c44b77.png)
 
 * 支付订单流程
-
 ![](http://processon.com/chart_image/5c32a9a1e4b048f108c44d6f.png)
 
 ## 测试
