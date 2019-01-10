@@ -45,13 +45,16 @@ hack12306
 
 用户认证（二维码）-> 查询余票 -> 提交订单 -> 支付订单
 
-用户认证流程：
-!img[](http://processon.com/chart_image/5c2c2b92e4b0fa03ce872c0b.png)
+* 用户认证流程
 
-提交订单流程：
+![](http://processon.com/chart_image/5c2c2b92e4b0fa03ce872c0b.png)
+
+* 提交订单流程
+
 ![](http://processon.com/chart_image/5c32a837e4b048f108c44b77.png)
 
-支付订单流程：
+* 支付订单流程
+
 ![](http://processon.com/chart_image/5c32a9a1e4b048f108c44d6f.png)
 
 ## 测试
