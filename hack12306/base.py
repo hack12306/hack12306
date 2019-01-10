@@ -4,9 +4,8 @@ base.py
 @author Meng.yangyang
 @description Wrapper network request
 @created Mon Jan 07 2019 13:17:16 GMT+0800 (CST)
-@last-modified Tue Jan 08 2019 19:46:44 GMT+0800 (CST)
+@last-modified Thu Jan 10 2019 14:45:03 GMT+0800 (CST)
 """
-
 
 import re
 import copy
