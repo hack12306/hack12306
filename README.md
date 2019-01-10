@@ -37,13 +37,13 @@ hack12306
 ```
 
 * hack12306/base.py 封装12306所有网络请求
-* hack12306/auth.py 12306认证模块
+* hack12306/auth.py 认证模块
 * hack12306/user.py 用户信息查询模块
-* hack12306/query.py 余票查询等公共信息查询模块
+* hack12306/query.py 余票查询等信息查询模块
 * hack12306/order.py 订票下单模块
 * hack12306/pay.py 订单支付模块
 * hack12306/settings.py 配置模块
-* hack12306/utils.py 公共的工具函数
+* hack12306/utils.py 工具模块
 * hack12306/constangs.py 常量、枚举、状态等
 * tests 测试用例
 
