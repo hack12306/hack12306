@@ -4,7 +4,7 @@ base.py
 @author Meng.yangyang
 @description Wrapper network request
 @created Mon Jan 07 2019 13:17:16 GMT+0800 (CST)
-@last-modified Thu Jan 10 2019 14:45:03 GMT+0800 (CST)
+@last-modified Fri Jan 11 2019 09:23:17 GMT+0800 (CST)
 """
 
 import re
@@ -25,6 +25,20 @@ from .utils import urlencode, tomorrow, time_cst_format
 _logger = logging.getLogger('hack12306')
 
 __all__ = ('TrainBaseAPI',)
+
+
+def _debug_resp(url, resp):
+    import os
+    import uuid
+    import datetime
+
+    today_str = datetime.date.today().strftime('%Y-%m-%d')
+    filepath = '/tmp/hack12306/%s/%s-%s' % (today_str, url, uuid.uuid1().hex)
+    if not os.path.exists(os.path.dirname(filepath)):
+        os.makedirs(os.path.dirname(filepath))
+
+    with open(filepath, 'w') as f:
+        f.write(resp.content)
 
 
 class TrainBaseAPI(object):
@@ -51,23 +65,15 @@ class TrainBaseAPI(object):
             return resp
 
         if resp.status_code != 200:
+            if settings.DEBUG:
+                _debug_resp(url, resp)
             raise exceptions.TrainRequestException(str(resp))
 
         try:
             content_json = json.loads(resp.content)
         except ValueError as e:
             if settings.DEBUG:
-                import os
-                import uuid
-                import datetime
-
-                today_str = datetime.date.today().strftime('%Y-%m-%d')
-                filepath = '/tmp/hack12306/%s/%s-%s' % (today_str, url, uuid.uuid1().hex)
-                if not os.path.exists(os.path.dirname(filepath)):
-                    os.makedirs(os.path.dirname(filepath))
-
-                with open(filepath, 'w') as f:
-                    f.write(resp.content)
+                _debug_resp(url, resp)
 
             _logger.warning(e)
             raise exceptions.TrainRequestException('response is not valid json type')
