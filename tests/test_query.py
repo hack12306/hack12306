@@ -49,5 +49,6 @@ class TestTrainInfoQueryAPI(object):
         print json.dumps(result, ensure_ascii=False)
 
     def test_info_query_left_tickets(self):
-        result = train_info_query_api.info_query_left_tickets('2019-01-10', 'VNP', 'SHH')
+        date_str = tomorrow().strftime('%Y-%m-%d')
+        result = train_info_query_api.info_query_left_tickets(date_str, 'MCN', 'BJP')
         print json.dumps(result, ensure_ascii=False)
