@@ -4,7 +4,6 @@ query.py
 @author Meng.yangyang
 @description info query
 @created Mon Jan 07 2019 13:17:16 GMT+0800 (CST)
-@last-modified Wed Jan 09 2019 12:07:03 GMT+0800 (CST)
 """
 
 import re

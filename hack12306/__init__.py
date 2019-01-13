@@ -5,7 +5,6 @@ __init__.py
 @author Meng.yangyang
 @description 12306 Python SDK
 @created Wed Dec 26 2018 23:28:09 GMT+0800 (CST)
-@last-modified Thu Jan 10 2019 14:46:59 GMT+0800 (CST)
 """
 
 from .pay import TrainPayAPI

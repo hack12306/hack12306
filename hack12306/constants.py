@@ -4,7 +4,6 @@ constants.py
 @author Meng.yangyang
 @description constants and enum
 @created Sat Dec 29 2018 12:04:04 GMT+0800 (CST)
-@last-modified Wed Jan 09 2019 15:19:17 GMT+0800 (CST)
 """
 
 

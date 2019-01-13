@@ -4,7 +4,6 @@ order.py
 @author Meng.yangyang
 @description Order
 @created Mon Jan 07 2019 13:17:16 GMT+0800 (CST)
-@last-modified Wed Jan 09 2019 22:02:43 GMT+0800 (CST)
 """
 
 import re

@@ -4,7 +4,6 @@ pay.py
 @author Meng.yangyang
 @description Payment
 @created Mon Jan 07 2019 13:17:16 GMT+0800 (CST)
-@last-modified Thu Jan 10 2019 14:45:30 GMT+0800 (CST)
 """
 
 import re

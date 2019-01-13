@@ -4,7 +4,6 @@ utils.py
 @author Meng.yangyang
 @description Util functions
 @created Mon Jan 07 2019 13:17:16 GMT+0800 (CST)
-@last-modified Wed Jan 09 2019 18:03:01 GMT+0800 (CST)
 """
 
 import six
