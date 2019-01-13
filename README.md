@@ -61,7 +61,7 @@ hack12306
 
 * 支付订单流程
 
-![](http://processon.com/chart_image/5c32a9a1e4b048f108c44d6f.png)
+![](http://processon.com/chart_image/5c3a92e7e4b0fa03ce96ed42.png)
 
 ## 测试
 
