@@ -12,7 +12,17 @@ from . import constants
 from . import exceptions
 from .base import TrainBaseAPI
 
-__all__ = ('TrainInfoQueryAPI',)
+__all__ = ('TrainInfoQueryAPI', 'train_check_seat_type_have_ticket')
+
+
+def train_check_seat_type_have_ticket(left_ticket):
+    """
+    检查座位席别有没有票
+    """
+    if left_ticket and left_ticket != u'无' and left_ticket != u'*':
+        return True
+    else:
+        return False
 
 
 class TrainInfoQueryAPI(TrainBaseAPI):
