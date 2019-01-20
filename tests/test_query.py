@@ -52,3 +52,8 @@ class TestTrainInfoQueryAPI(object):
         date_str = tomorrow().strftime('%Y-%m-%d')
         result = train_info_query_api.info_query_left_tickets(date_str, 'MCN', 'BJP')
         print json.dumps(result, ensure_ascii=False)
+
+    def test_info_query_train_search(self):
+        result = train_info_query_api.info_query_train_search('K571')
+        assert isinstance(result, list)
+        print json.dumps(result, ensure_ascii=False)

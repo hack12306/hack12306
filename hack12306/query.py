@@ -193,3 +193,15 @@ class TrainInfoQueryAPI(TrainBaseAPI):
                 return station
         else:
             return None
+
+    def info_query_train_search(self, train_no, train_date='', **kwargs):
+        """
+        火车车次搜索
+        """
+        url = 'https://search.12306.cn/search/v1/train/search'
+        params = {
+            'keyword': train_no,
+            'date': train_date
+        }
+        resp = self.submit(url, params, method='GET', **kwargs)
+        return resp['data']
