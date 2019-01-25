@@ -57,3 +57,11 @@ class TestTrainInfoQueryAPI(object):
         result = train_info_query_api.info_query_train_search('K571')
         assert isinstance(result, list)
         print json.dumps(result, ensure_ascii=False)
+
+    def test_info_query_dishonest(self):
+        result = train_info_query_api.info_query_dishonest()
+        assert isinstance(result, list)
+
+    def test_info_query_dishonest_getone(self):
+        result = train_info_query_api.info_query_dishonest_getone('孟', '131122')
+        assert isinstance(result, list)

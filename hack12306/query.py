@@ -205,3 +205,23 @@ class TrainInfoQueryAPI(TrainBaseAPI):
         }
         resp = self.submit(url, params, method='GET', **kwargs)
         return resp['data']
+
+    def info_query_dishonest(self, **kwargs):
+        """
+        失信名单
+        """
+        url = 'https://kyfw.12306.cn/otn/queryDishonest/query'
+        resp = self.submit(url, method='GET',  **kwargs)
+        return resp['data']['right']
+
+    def info_query_dishonest_getone(self, passenger_name, passenger_id_no, **kwargs):
+        """
+        （个人）失信信息
+        """
+        url = 'https://kyfw.12306.cn/otn/queryDishonest/getOne'
+        params = {
+            'passenger_name': passenger_name,
+            'passenger_id_no': passenger_id_no,
+        }
+        resp = self.submit(url, params, method='POST', **kwargs)
+        return resp['data']
