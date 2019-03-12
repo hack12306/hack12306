@@ -17,7 +17,7 @@ import datetime
 def cookie_str_to_dict(cookie_str):
     cookies = []
     for cookie in [cookie.strip() for cookie in cookie_str.split(';')]:
-        cookies.append(cookie.split('='))
+        cookies.append((cookie.split('=')[0], ''.join(cookie.split('=')[1:])))
     return dict(cookies)
 
 

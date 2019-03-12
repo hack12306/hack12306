@@ -48,6 +48,10 @@ class TrainBaseAPI(object):
     def submit(self, url, params=None, method='POST', format='form', parse_resp=True, **kwargs):
         _logger.debug('train request. url:%s method:%s params:%s' % (url, method, json.dumps(params)))
 
+        headers = kwargs.get('headers', {})
+        headers.update(**self.headers)
+        kwargs['headers'] = headers
+
         if method == 'GET':
             if isinstance(params, list):
                 params = urlencode(params)
@@ -82,3 +86,10 @@ class TrainBaseAPI(object):
             raise exceptions.TrainAPIException(resp.content)
 
         return content_json
+
+    @property
+    def headers(self):
+        return {
+            'User-Agent': ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) '
+                           'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.109 Safari/537.36'),
+        }
