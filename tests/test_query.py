@@ -65,3 +65,8 @@ class TestTrainInfoQueryAPI(object):
     def test_info_query_dishonest_getone(self):
         result = train_info_query_api.info_query_dishonest_getone('孟', '131122')
         assert isinstance(result, list)
+
+    def test_info_query_trains(self):
+        result = train_info_query_api.info_query_trains()
+        assert isinstance(result, list)
+        print json.dumps(result[0], ensure_ascii=False)

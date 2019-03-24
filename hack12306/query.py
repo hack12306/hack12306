@@ -7,12 +7,16 @@ query.py
 """
 
 import re
+import json
+import logging
 
 from . import constants
 from . import exceptions
 from .base import TrainBaseAPI
 
 __all__ = ('TrainInfoQueryAPI', 'train_check_seat_type_have_ticket')
+
+_logger = logging.getLogger('hack12306')
 
 
 def train_check_seat_type_have_ticket(left_ticket):
@@ -185,6 +189,37 @@ class TrainInfoQueryAPI(TrainBaseAPI):
             raise exceptions.TrainAPIException(str(resp))
 
         return _parse_stations(resp.content)
+
+    def info_query_trains(self, **kwargs):
+        def _parse_trains(s):
+            s = s.replace('var train_list =', '')
+            s_dict = json.loads(s)
+            train_list = []
+
+            train_code_pattern = re.compile(r'([0-9,A-Z]+?)\((.*)\)')
+            for _, type_trains in s_dict.items():
+                for _, trains in type_trains.items():
+                    for train in trains:
+                        train_code_match = train_code_pattern.match(train['station_train_code'])
+                        if not train_code_match:
+                            _logger.warn('train code not match. %s' % train['station_train_code'])
+                            continue
+
+                        m_groups = train_code_match.groups()
+                        train_list.append({
+                            'train_code': m_groups[0],
+                            'from_station_name': m_groups[1].split('-')[0].strip().replace(' ', ''),
+                            'to_station_name': m_groups[1].split('-')[1].strip().replace(' ', ''),
+                            'train_no': train['train_no'].strip().replace(' ', ''),
+                        })
+            return train_list
+
+        url = 'https://kyfw.12306.cn/otn/resources/js/query/train_list.js'
+        resp = self.submit(url, method='GET', parse_resp=False, **kwargs)
+        if not resp.status_code == 200:
+            raise exceptions.TrainAPIException(str(resp))
+
+        return _parse_trains(resp.content)
 
     def info_query_station_by_name(self, station_name, station_version=None, **kwargs):
         station_list = self.info_query_station_list(station_version)
