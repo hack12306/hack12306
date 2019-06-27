@@ -45,7 +45,7 @@ class TrainInfoQueryAPI(TrainBaseAPI):
         date_pattern = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
         assert date_pattern.match(train_date), 'Invalid train_date param. %s' % train_date
 
-        url = 'https://kyfw.12306.cn/otn/leftTicket/queryX'
+        url = 'https://kyfw.12306.cn/otn/leftTicket/query'
         params = [
             ('leftTicketDTO.train_date', train_date),
             ('leftTicketDTO.from_station', from_station),

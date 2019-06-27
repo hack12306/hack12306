@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="hack12306",
-    version="0.1.18",
+    version="0.1.19",
     author="Meng.yangyang",
     author_email="mengyy_linux@163.com",
     description="12306 Python SDK, packaging the 12306 API",
