@@ -30,18 +30,12 @@ def train_check_seat_type_have_ticket(left_ticket):
 
 
 class TrainInfoQueryAPI(TrainBaseAPI):
+
     """
     信息查询
     """
 
-    def info_query_left_tickets(self, train_date, from_station, to_station, purpose_codes='ADULT', **kwargs):
-        """
-        信息查询-余票查询
-        :param train_date 乘车日期
-        :param from_station 出发站
-        :param to_station 到达站
-        :return JSON 数组
-        """
+    def _left_tickets(self, train_date, from_station, to_station, purpose_codes='ADULT', **kwargs):
         date_pattern = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
         assert date_pattern.match(train_date), 'Invalid train_date param. %s' % train_date
 
@@ -79,7 +73,32 @@ class TrainInfoQueryAPI(TrainBaseAPI):
                 constants.SEAT_TYPE_HARD_SEAT: train[29],
                 constants.SEAT_TYPE_NO_SEAT: train[26],
             })
-        return trains
+        result = {
+            'trains': trains,
+            'map': resp['data']['map'],
+        }
+        return result
+
+    def info_query_left_tickets_v2(self, train_date, from_station, to_station, purpose_codes='ADULT', **kwargs):
+        """
+        信息查询-余票查询
+        :param train_date 乘车日期
+        :param from_station 出发站
+        :param to_station 到达站
+        :return JSON 数组
+        """
+        return self._left_tickets(train_date, from_station, to_station, purpose_codes=purpose_codes, **kwargs)
+
+    def info_query_left_tickets(self, train_date, from_station, to_station, purpose_codes='ADULT', **kwargs):
+        """
+        信息查询-余票查询
+        :param train_date 乘车日期
+        :param from_station 出发站
+        :param to_station 到达站
+        :return JSON 数组
+        """
+        result =  self._left_tickets(train_date, from_station, to_station, purpose_codes=purpose_codes, **kwargs)
+        return result['trains']
 
     def info_query_station_trains(self, train_start_date, train_station_code, **kwargs):
         """
