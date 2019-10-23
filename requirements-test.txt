@@ -5,4 +5,4 @@ autopep8==1.0.4
 
 requests==2.12.4
 BeautifulSoup==3.2.1
-Pillow==5.4.0
+Pillow==6.2.0
