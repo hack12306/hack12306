@@ -3,6 +3,6 @@ pylint==1.9.3
 flake8==3.5.0
 autopep8==1.0.4
 
-requests==2.12.4
+requests==2.20.0
 BeautifulSoup==3.2.1
 Pillow==9.0.1
